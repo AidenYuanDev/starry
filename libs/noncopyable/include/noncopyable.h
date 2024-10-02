@@ -1,7 +1,7 @@
 #pragma once
 
-class noncopyable
-{
+namespace starry {
+class noncopyable {
  public:
   noncopyable(const noncopyable&) = delete;
   void operator=(const noncopyable&) = delete;
@@ -10,3 +10,4 @@ class noncopyable
   noncopyable() = default;
   ~noncopyable() = default;
 };
+}  // namespace starry

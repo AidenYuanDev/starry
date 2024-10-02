@@ -4,8 +4,6 @@ target_sources(${PROJECT_NAME} PRIVATE
     main.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    add 
-    sub
     noncopyable)
 
 # 根据构建类型设置选项

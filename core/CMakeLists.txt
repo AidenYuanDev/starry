@@ -1,7 +1,5 @@
 # 列出所有模块
 set(MODULES
-    add 
-    sub
     # 添加其他模块...
 )
 

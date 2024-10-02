@@ -1,6 +1,8 @@
 # 列出所有模块
 set(MODULES
     noncopyable
+    copyable
+    log
     # 添加其他模块...
 )
 

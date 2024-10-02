@@ -8,8 +8,9 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE DEBUG)
 endif()
 
-# 启用测试
-option(BUILD_TESTING "Build the testing tree." OFF)
+# 是否启用测试 ON or OFF
+option(BUILD_TESTING "Build the testing tree." ON)
+enable_testing()
 
 # 设置输出目录
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
