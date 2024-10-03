@@ -1,8 +1,9 @@
 # 列出所有模块
 set(MODULES
-    noncopyable
-    copyable
-    log
+    ./noncopyable/
+    ./copyable/
+    ./log/
+    ./thread_pool/
     # 添加其他模块...
 )
 
