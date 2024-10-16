@@ -2,6 +2,8 @@
 #include <atomic>
 #include "thread_pool.h"
 
+using namespace starry;
+
 class ThreadPoolTest : public ::testing::Test {
  protected:
   void SetUp() override {}
