@@ -9,7 +9,6 @@ include(ProjectSettings)
 include(FindDependencies)
 
 # 添加子目录
-add_subdirectory(./base/)
 add_subdirectory(./starry/)
 add_subdirectory(./src/)
 

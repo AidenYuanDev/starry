@@ -1,6 +1,7 @@
 # 列出所有模块
 set(MODULES
   ./net/
+  ./base/
     # 添加其他模块...
 )
 
