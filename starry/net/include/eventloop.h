@@ -35,7 +35,7 @@ class EventLoop {
   // 预处理函数
   void runInLoop(Functor cb);  // 上层调用在当前EventLoop中调用
   void queueInLoop(Functor cb);  // 允许其他线程安全的向EventLoop所属的线程提交任务
-  size_t queueSize() const;  // 预处理函数的个数
+  size_t queueSize();  // 预处理函数的个数
 
   // 内部唤醒 EventLoop
   void wakeup();
@@ -66,7 +66,7 @@ class EventLoop {
   void printActiceChannels() const;
 
   // EventLoop的状态
-  std::atomic<bool> lopping_;                 // 是否开启loop
+  std::atomic<bool> looping_;                 // 是否开启loop
   std::atomic<bool> quit_;                    // 是否离开循环
   std::atomic<bool> eventHandling_;           // 是否在处理Channel
   std::atomic<bool> callingPendingFunctors_;  // 是否在调用待处理函数
@@ -86,7 +86,7 @@ class EventLoop {
 
   // 定时器
   int64_t iteration_;                       // 通过记录循环次数来预估定时时间，减少查看系统时间的次数，提高性能
-  std::unique_ptr<TimerQueue> timerQueue_;  //  在EventLoop中前向声明的对象，且只由EventLoop独占故用unique_ptr
+  // std::unique_ptr<TimerQueue> timerQueue_;  //  在EventLoop中前向声明的对象，且只由EventLoop独占故用unique_ptr
 
   // Poller
   std::chrono::steady_clock::time_point pollReturnTime_;  // poll返回时间，用来推导定时任务的结束时间
