@@ -9,6 +9,9 @@ target_sources(net PRIVATE
   ./src/channel.cpp
   ./src/sockets_ops.cpp
   ./src/eventlopp.cpp
+  ./src/eventloop_thread.cpp
+  ./src/eventloop_threadpool.cpp
+  ./src/inet_address.cpp
 )
 
 target_link_libraries(net PRIVATE

@@ -15,6 +15,7 @@
 
 using namespace starry;
 
+// 地址强制转换
 const struct sockaddr* sockets::sockaddr_cast(const struct sockaddr_in6* addr) {
   return reinterpret_cast<const struct sockaddr*>(addr);
 }
@@ -37,6 +38,7 @@ const struct sockaddr_in6* sockets::sockaddr_in6_cast(
   return reinterpret_cast<const struct sockaddr_in6*>(addr);
 }
 
+// 创建一个非阻塞的 socket | SOCK_NONBLOCK (非阻塞) | SOCK_CLOEXEC (执行子进程不持有 socket,防止子进程替换父 socket)
 int sockets::createNonBlockingOrDie(sa_family_t famile) {
   int sockfd = ::socket(famile, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0);
   if (sockfd < 0) {
@@ -45,6 +47,7 @@ int sockets::createNonBlockingOrDie(sa_family_t famile) {
   return sockfd;
 }
 
+// 绑定
 void sockets::bindOrDie(int sockfd, const struct sockaddr* addr) {
   int ret =
       ::bind(sockfd, addr, static_cast<socklen_t>(sizeof(struct sockaddr_in6)));
@@ -53,6 +56,7 @@ void sockets::bindOrDie(int sockfd, const struct sockaddr* addr) {
   }
 }
 
+// 监听
 void sockets::listenOrDir(int sockfd) {
   int ret = ::listen(sockfd, SOMAXCONN);
   if (ret < 0) {
@@ -60,6 +64,7 @@ void sockets::listenOrDir(int sockfd) {
   }
 }
 
+// 接收连接
 int sockets::accept(int sockfd, struct sockaddr_in6* addr) {
   socklen_t addrlen = static_cast<socklen_t>(sizeof(*addr));
   int connfd = ::accept4(sockfd, sockaddr_cast(addr), &addrlen,
@@ -94,35 +99,42 @@ int sockets::accept(int sockfd, struct sockaddr_in6* addr) {
   return connfd;
 }
 
+// 发起连接
 int sockets::connect(int sockfd, const struct sockaddr* addr) {
   return ::connect(sockfd, addr,
                    static_cast<socklen_t>(sizeof(struct sockaddr_in6)));
 }
 
+// 收取消息
 ssize_t sockets::read(int sockfd, void* buf, size_t count) {
   return ::read(sockfd, buf, count);
 }
 
+// 收取消息
 ssize_t sockets::readv(int sockfd, const struct iovec* iov, int iovcnt) {
   return ::readv(sockfd, iov, iovcnt);
 }
 
+// 发送消息
 ssize_t sockets::write(int sockfd, const void* buf, size_t count) {
   return ::write(sockfd, buf, count);
 }
 
+// 关闭 socket 
 void sockets::close(int sockfd) {
   if (::close(sockfd) < 0) {
     LOG_FATAL << "sockets::close";
   }
 }
 
+// shutdown 关闭发送消息
 void sockets::shutdownWrite(int sockfd) {
   if (::shutdown(sockfd, SHUT_WR) < 0) {
     LOG_FATAL << "sockets::shutdown";
   }
 }
 
+// 转换成 IP:port
 void sockets::toIpPort(char* buf, size_t size, const struct sockaddr* addr) {
   if (addr->sa_family == AF_INET6) {
     buf[0] = '[';
@@ -142,6 +154,7 @@ void sockets::toIpPort(char* buf, size_t size, const struct sockaddr* addr) {
   }
 }
 
+// 转换成 IP
 void sockets::toIp(char* buf, size_t size, const struct sockaddr* addr) {
   if (addr->sa_family == AF_INET6) {
     assert(size >= INET6_ADDRSTRLEN);
@@ -154,6 +167,7 @@ void sockets::toIp(char* buf, size_t size, const struct sockaddr* addr) {
   }
 }
 
+// ipv4 把字符格式地址转换成 IP:port ，存放到 addr
 void sockets::fromIpPort(const char* ip,
                          uint16_t port,
                          struct sockaddr_in* addr) {
@@ -164,6 +178,7 @@ void sockets::fromIpPort(const char* ip,
   }
 }
 
+// ipv6 把字符格式地址转换成 IP:port ，存放到 addr
 void sockets::fromIpPort(const char* ip,
                          uint16_t port,
                          struct sockaddr_in6* addr) {
@@ -174,6 +189,7 @@ void sockets::fromIpPort(const char* ip,
   }
 }
 
+// 获取 socket 发生错误的原因
 int sockets::getSocketError(int sockfd) {
   int optval;
   socklen_t optlen = static_cast<socklen_t>(sizeof(optval));
@@ -185,6 +201,7 @@ int sockets::getSocketError(int sockfd) {
   }
 }
 
+// 获取当前 sockaddr_in6
 struct sockaddr_in6 sockets::getLocalAddr(int sockfd) {
   struct sockaddr_in6 localaddr;
   memset(&localaddr, 0, sizeof(localaddr));
@@ -195,6 +212,7 @@ struct sockaddr_in6 sockets::getLocalAddr(int sockfd) {
   return localaddr;
 }
 
+// 获取对方 sockaddr_in6
 struct sockaddr_in6 sockets::getPeerAddr(int sockfd) {
   struct sockaddr_in6 peeraddr;
   memset(&peeraddr, 0, sizeof(peeraddr));
@@ -205,6 +223,7 @@ struct sockaddr_in6 sockets::getPeerAddr(int sockfd) {
   return peeraddr;
 }
 
+// 是否是本地连接
 bool sockets::isSelfConnect(int sockfd) {
   struct sockaddr_in6 localaddr = getLocalAddr(sockfd);
   struct sockaddr_in6 peeraddr = getPeerAddr(sockfd);
