@@ -110,7 +110,7 @@ ssize_t sockets::read(int sockfd, void* buf, size_t count) {
   return ::read(sockfd, buf, count);
 }
 
-// 收取消息
+// 收取消息, 填数组中
 ssize_t sockets::readv(int sockfd, const struct iovec* iov, int iovcnt) {
   return ::readv(sockfd, iov, iovcnt);
 }
