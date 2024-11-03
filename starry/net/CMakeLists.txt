@@ -13,6 +13,8 @@ target_sources(net PRIVATE
   ./src/eventloop_threadpool.cpp
   ./src/inet_address.cpp
   ./src/buffer.cpp
+  ./src/tcp_connection.cpp
+  ./src/socket.cpp
 )
 
 target_link_libraries(net PRIVATE

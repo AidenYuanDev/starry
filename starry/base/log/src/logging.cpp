@@ -1,11 +1,18 @@
 #include <bits/chrono.h>
 #include <cmath>
+#include <cstring>
 #include <format>
 #include <iostream>
 #include <chrono>
 #include "logging.h"
 
 namespace starry {
+
+thread_local char t_errnobuf[512];
+
+const char* strerror_tl(int saveErrno) {
+  return strerror_r(saveErrno, t_errnobuf, sizeof(t_errnobuf));
+}
 
 // 初始化静态成员
 LogLevel Logger::g_logLevel = LogLevel::INFO;
