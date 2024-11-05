@@ -2,13 +2,16 @@
 #include "eventloop_thread.h"
 #include <cassert>
 #include <cstddef>
+#include <cstdio>
 #include <memory>
+#include <string>
 #include "eventloop_threadpool.h"
 
 using namespace starry;
 
-EventLoopThreadPool::EventLoopThreadPool(EventLoop* baseLoop)
+EventLoopThreadPool::EventLoopThreadPool(EventLoop* baseLoop, const std::string& nameArg)
     : baseLoop_(baseLoop),
+      name_(nameArg),
       started_(false),
       numThreads_(0),
       next_(0) {}
@@ -23,7 +26,7 @@ void EventLoopThreadPool::start(const ThreadInitCallback& cb) {
   started_ = true;
 
   for (int i = 0; i < numThreads_; i++) {
-    EventLoopThread* t = new EventLoopThread(cb);
+    EventLoopThread* t = new EventLoopThread(cb, name_ + std::to_string(i));
     threads_.push_back(std::unique_ptr<EventLoopThread>(t));
     loops_.push_back(t->startLoop());
   }

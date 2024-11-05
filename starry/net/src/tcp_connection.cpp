@@ -33,10 +33,12 @@ void starry::defaultMessageCallback(const TcpConnectionPtr&,
 }
 
 TcpConnection::TcpConnection(EventLoop* loop,
+                             const std::string& nameArg,
                              int sockfd,
                              const InetAddress& localAddr,
                              const InetAddress& peerAddr)
     : loop_(loop),
+      name_(nameArg),
       state_(StateE::kConnecting),
       reading_(true),
       socket_(new Socket(sockfd)),
@@ -48,13 +50,15 @@ TcpConnection::TcpConnection(EventLoop* loop,
       std::bind(&TcpConnection::handleRead, this, std::placeholders::_1));
   channel_->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
   channel_->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
-  LOG_DEBUG << "TcpConnection::ctor" << this << " fd=" << sockfd;
+  LOG_DEBUG << "TcpConnection::ctor[" <<  name_ << "] at " << this
+            << " fd=" << sockfd;
   socket_->setKeepAlive(true);
 }
 
 TcpConnection::~TcpConnection() {
-  LOG_DEBUG << "TcpConnection::dtor" << this << " fd=" << channel_->fd()
-            << " state_=" << stateToString();
+  LOG_DEBUG << "TcpConnection::dtor[" <<  name_ << "] at " << this
+            << " fd=" << channel_->fd()
+            << " state=" << stateToString();
   assert(state_ == TcpConnection::StateE::kDisconnected);
 }
 
@@ -318,6 +322,6 @@ void TcpConnection::handleClose() {
 void TcpConnection::handleError() {
   char t_errnobuf[512];
   int err = sockets::getSocketError(channel_->fd());
-  LOG_ERROR << "TcpConnection::handleError " << err << " "
-            << strerror_r(err, t_errnobuf, sizeof(t_errnobuf));
+  LOG_ERROR << "TcpConnection::handleError [" << name_
+            << "] - SO_ERROR = " << err << " " << strerror_r(err, t_errnobuf, sizeof(t_errnobuf));
 }

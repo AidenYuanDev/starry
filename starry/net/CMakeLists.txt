@@ -8,13 +8,15 @@ target_sources(net PRIVATE
   ./src/epoll_poller.cpp
   ./src/channel.cpp
   ./src/sockets_ops.cpp
-  ./src/eventlopp.cpp
+  ./src/eventloop.cpp
   ./src/eventloop_thread.cpp
   ./src/eventloop_threadpool.cpp
   ./src/inet_address.cpp
   ./src/buffer.cpp
   ./src/tcp_connection.cpp
   ./src/socket.cpp
+  ./src/tcp_server.cpp
+  ./src/acceptor.cpp
 )
 
 target_link_libraries(net PRIVATE

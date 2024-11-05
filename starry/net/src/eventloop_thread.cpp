@@ -6,8 +6,9 @@
 
 using namespace starry;
 
-EventLoopThread::EventLoopThread(const ThreadInitCallback& cb)
-    : loop_(nullptr), exiting_(false), callback_(cb) {}
+EventLoopThread::EventLoopThread(const ThreadInitCallback& cb,
+                                 const std::string& name)
+    : loop_(nullptr), name_(name), exiting_(false), callback_(cb) {}
 
 EventLoopThread::~EventLoopThread() {
   exiting_ = true;
@@ -41,11 +42,11 @@ void EventLoopThread::threadFunc() {
     std::lock_guard<std::mutex> lock(mutex_);
     loop_ = &loop;
   }
-  
+
   cond_.notify_one();
 
   loop.loop();
-  
+
   std::lock_guard<std::mutex> lock(mutex_);
   loop_ = nullptr;
 }

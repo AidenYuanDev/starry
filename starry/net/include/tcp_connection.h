@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <string>
 #include <string_view>
 #include "buffer.h"
 #include "callbacks.h"
@@ -20,6 +21,7 @@ class Socket;
 class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
  public:
   TcpConnection(EventLoop* loop,
+                const std::string& nameArg,
                 int sockfd,
                 const InetAddress& localAddr,
                 const InetAddress& peerAddr);
@@ -27,6 +29,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
   // 获取 当前 loop
   EventLoop* getLoop() const { return loop_; }
   // 获取绑定的本地地址
+  const std::string& name() const { return name_; }
   const InetAddress& localAddress() const { return localAddr_; }
   // 获取绑定的对方地址
   const InetAddress& peerAddress() const { return peerAddr_; }
@@ -93,6 +96,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
   void stopReadInLoop();                             // 停止读
 
   EventLoop* loop_;                              // 所持有的 loop
+  const std::string name_;                       // loop name
   std::atomic<StateE> state_;                    // 现在的状态
   bool reading_;                                 // 是否在读
   std::unique_ptr<Socket> socket_;               // 操作 socket fd
