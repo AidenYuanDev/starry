@@ -54,4 +54,8 @@ class Logger {
 #define LOG_ERROR starry::Logger(starry::LogLevel::ERROR).stream()
 #define LOG_FATAL starry::Logger(starry::LogLevel::FATAL).stream()
 
+// 错误处理
+
+const char* strerror_tl(int savedErrno);
+
 }  // namespace starry

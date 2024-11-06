@@ -17,6 +17,7 @@ target_sources(net PRIVATE
   ./src/socket.cpp
   ./src/tcp_server.cpp
   ./src/acceptor.cpp
+  ./src/tcp_client.cpp
 )
 
 target_link_libraries(net PRIVATE
