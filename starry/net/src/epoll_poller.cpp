@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <cstring>
 
+#include "callbacks.h"
 #include "channel.h"
 #include "epoll_poller.h"
 #include "eventloop.h"
@@ -33,7 +34,7 @@ EpollPoller::~EpollPoller() {
 }
 
 // 把监听到的活跃文件描述符通过 fillActiveChannels 放到 activeChannels中
-std::chrono::steady_clock::time_point EpollPoller::poll(
+Timestamp EpollPoller::poll(
     int timeoutMs,
     ChannelList* activeChannels) {
   LOG_TRACE << "fd total count " << channels_.size();
@@ -41,7 +42,7 @@ std::chrono::steady_clock::time_point EpollPoller::poll(
                                static_cast<int>(events_.size()), timeoutMs);
 
   int savedErron = errno;
-  auto now = std::chrono::steady_clock::now();
+  auto now = std::chrono::system_clock::now();
   if (numEvents > 0) {
     LOG_TRACE << numEvents << " events happened";
     fillActiveChannels(numEvents, activeChannels);

@@ -8,7 +8,7 @@ namespace starry {
 
 class Buffer;
 class TcpConnection;
-using Timestamp = std::chrono::steady_clock::time_point;
+using Timestamp = std::chrono::system_clock::time_point;
 using TcpConnectionPtr = std::shared_ptr<TcpConnection>;
 using ConnectionCallback = std::function<void(const TcpConnectionPtr&)>;
 using CloseCallback = std::function<void(const TcpConnectionPtr&)>;

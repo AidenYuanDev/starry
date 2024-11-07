@@ -50,7 +50,7 @@ void  Channel::remove() {
   loop_->removeChannel(this);
 }
 
-void Channel::handleEvent(std::chrono::steady_clock::time_point receiveTime) {
+void Channel::handleEvent(Timestamp receiveTime) {
   std::shared_ptr<void> guard;
   if (tied_) {
     guard = tie_.lock();
@@ -62,7 +62,7 @@ void Channel::handleEvent(std::chrono::steady_clock::time_point receiveTime) {
   }
 }
 
-void Channel::handleEventWithGuard(std::chrono::steady_clock::time_point receiveTime) {
+void Channel::handleEventWithGuard(Timestamp receiveTime) {
   eventHandling_ = true;
   LOG_TRACE << reventsToString();
   if ((revents_ & EPOLLHUP) && !(revents_ & EPOLLIN)) {

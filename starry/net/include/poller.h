@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include "eventloop.h"
+#include "callbacks.h"
 
 namespace starry {
 
@@ -17,7 +18,7 @@ class Poller {
   virtual ~Poller();
 
   // 操作 Channel 
-  virtual std::chrono::steady_clock::time_point poll (int timeoutMs, ChannelList* activeChannells) = 0;
+  virtual Timestamp poll (int timeoutMs, ChannelList* activeChannells) = 0;
   virtual void updateChannel(Channel* channel) = 0;
   virtual void removeChannel(Channel* channel) = 0;
 

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "callbacks.h"
 #include <atomic>
-#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -29,7 +29,7 @@ class EventLoop {
   void quit();  // 离开循环
 
   // 定时器相关
-  std::chrono::steady_clock::time_point pollReruenTime() const { return pollReturnTime_; }
+  Timestamp pollReruenTime() const { return pollReturnTime_; }
   int64_t iteration() const { return iteration_; }
 
   // 预处理函数
@@ -89,7 +89,7 @@ class EventLoop {
   // std::unique_ptr<TimerQueue> timerQueue_;  //  在EventLoop中前向声明的对象，且只由EventLoop独占故用unique_ptr
 
   // Poller
-  std::chrono::steady_clock::time_point pollReturnTime_;  // poll返回时间，用来推导定时任务的结束时间
+  Timestamp pollReturnTime_;  // poll返回时间，用来推导定时任务的结束时间
   std::unique_ptr<Poller> poller_;                        //  在EventLoop中前向声明的对象，且只由EventLoop独占故用unique_ptr
 };
 

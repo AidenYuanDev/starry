@@ -1,9 +1,8 @@
 #pragma once
 
-#include <algorithm>
-#include <chrono>
 #include <functional>
 #include <memory>
+#include "callbacks.h"
 
 namespace starry {
 
@@ -13,13 +12,13 @@ class Channel {
  public:
   using EventCallback = std::function<void()>;
   using ReadEventCallback =
-      std::function<void(std::chrono::steady_clock::time_point)>;
+      std::function<void(Timestamp)>;
 
   Channel(EventLoop* loop, int fd);
   ~Channel();
 
   // 设置回调
-  void handleEvent(std::chrono::steady_clock::time_point receiveTime); // 定时回调
+  void handleEvent(Timestamp receiveTime); // 定时回调
   void setReadCallback(ReadEventCallback cb) { readCallback_ = std::move(cb); } // 读回调 
   void setWriteCallback(EventCallback cb) { writeCallback_ = std::move(cb); } // 写回调
   void setCloseCallback(EventCallback cb) { closeCallback_ = std::move(cb); } // 关闭回调
@@ -55,7 +54,7 @@ class Channel {
   static std::string eventsToString(int fd, int ev);
 
   void update();
-  void handleEventWithGuard(std::chrono::steady_clock::time_point receiveTime);
+  void handleEventWithGuard(Timestamp receiveTime);
 
   // 文件描述符事件
   static const int kNoneEvent;   // 无事件

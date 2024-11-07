@@ -1,5 +1,5 @@
 #pragma once
-#include <chrono>
+
 #include <vector>
 #include "channel.h"
 #include "eventloop.h"
@@ -12,7 +12,7 @@ class EpollPoller : public Poller {
   EpollPoller(EventLoop* loop);
   ~EpollPoller() override;
 
-  std::chrono::steady_clock::time_point poll(
+  Timestamp poll(
       int timeoutMs,
       ChannelList* activeChannels) override;
   void updateChannel(Channel* channel) override;
