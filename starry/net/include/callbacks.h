@@ -10,6 +10,7 @@ class Buffer;
 class TcpConnection;
 using Timestamp = std::chrono::system_clock::time_point;
 using TcpConnectionPtr = std::shared_ptr<TcpConnection>;
+using TimerCallback = std::function<void()>;
 using ConnectionCallback = std::function<void(const TcpConnectionPtr&)>;
 using CloseCallback = std::function<void(const TcpConnectionPtr&)>;
 using WriteCompleteCallback = std::function<void(const TcpConnectionPtr&)>;

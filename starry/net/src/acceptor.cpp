@@ -23,7 +23,7 @@ Acceptor::Acceptor(EventLoop* loop, const InetAddress& listenAddr, bool reusepor
   assert(idleFd_ >= 0);
   acceptSocket_.setReuseAddr(true);
   acceptSocket_.setReusePort(reuseport);
-  acceptSocket_.bindAddresse(listenAddr);
+  acceptSocket_.bindAddress(listenAddr);
   acceptChannel_.setReadCallback(std::bind(&Acceptor::handleRead, this));
 }
 
@@ -45,7 +45,7 @@ void Acceptor::listen() {
 void Acceptor::handleRead() {
   loop_->assertInLoopThread();
   InetAddress peerAddr;
-  int connfd = acceptSocket_.accpet(&peerAddr);
+  int connfd = acceptSocket_.accept(&peerAddr);
   if (connfd >= 0) {
     if (newConnectionCallback_) {
       newConnectionCallback_(connfd, peerAddr);

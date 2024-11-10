@@ -5,6 +5,7 @@
 #include "logging.h"
 #include "sockets_ops.h"
 
+#include <algorithm>
 #include <errno.h>
 #include <cassert>
 #include <functional>
@@ -135,7 +136,7 @@ void Connector::resetChannel() {
 
 // 写回调 -- 处理写可能发生的异常状态
 void Connector::handleWrite() {
-  LOG_TRACE << "Connector::handleWrite " << state_;
+  LOG_TRACE << "Connector::handleWrite " << stateToString(state_);
 
   if (state_ == States::KConnecting) {
     int sockfd = removeAndResetChannel();
@@ -162,7 +163,7 @@ void Connector::handleWrite() {
 
 // 异常回调 -- 处理异常时，不在 KConnecting 状态的情况
 void Connector::handleError() {
-  LOG_ERROR << "Connector::handleError state=" << state_;
+  LOG_ERROR << "Connector::handleError state=" << stateToString(state_);
   if (state_ == States::KConnecting) {
     int sockfd = removeAndResetChannel();
     int err = sockets::getSocketError(sockfd);
@@ -172,4 +173,28 @@ void Connector::handleError() {
 }
 
 // 等定时器实现
-void Connector::retry(int sockfd) {}
+void Connector::retry(int sockfd) {
+  sockets::close(sockfd);
+  setState(States::kDisconnected);
+  if (connect_) {
+    LOG_INFO << "Connector::retry - Retry connecting to " << serverAddr_.toIpPort()
+             << " in " << retryDelayMs_ << " milliseconds. ";
+    loop_->runAfter(retryDelayMs_ / 1000.0, std::bind(&Connector::startInLoop, shared_from_this()));
+    retryDelayMs_ = std::min(retryDelayMs_ * 2, kMaxRetryDelayMs);
+  } else {
+    LOG_DEBUG << "do not connect";
+  }
+}
+
+std::string Connector::stateToString(States state) {
+  switch (state) {
+    case States::kDisconnected:
+      return "kDisconnected";
+    case States::KConnecting:
+      return "KConnecting";
+    case States::KConnected:
+      return "KConnected";
+    default:
+      return "invalid state";
+  }
+}

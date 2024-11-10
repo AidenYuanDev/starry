@@ -47,15 +47,15 @@ bool Socket::getTcpInfoString(char* buf, size_t len) const {
   return ok;
 }
 
-void Socket::bindAddresse(const InetAddress& addr) {
+void Socket::bindAddress(const InetAddress& addr) {
   sockets::bindOrDie(sockfd_, addr.getSockAddr());
 }
 
 void Socket::listen() {
-  sockets::listenOrDir(sockfd_);
+  sockets::listenOrDie(sockfd_);
 }
 
-int Socket::accpet(InetAddress* peeraddr) {
+int Socket::accept(InetAddress* peeraddr) {
   struct sockaddr_in6 addr;
   memset(&addr, 0, sizeof(addr));
   int connfd = sockets::accept(sockfd_, &addr);

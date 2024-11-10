@@ -32,21 +32,22 @@ EventLoop* EventLoopThread::startLoop() {
 
 // 创建一个 loop_, 并运行
 void EventLoopThread::threadFunc() {
-  EventLoop loop;
+  EventLoop* loop = new EventLoop();  // 使用堆分配
 
   if (callback_) {
-    callback_(&loop);
+    callback_(loop);
   }
 
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    loop_ = &loop;
+    loop_ = loop;
   }
 
   cond_.notify_one();
 
-  loop.loop();
+  loop->loop();
 
   std::lock_guard<std::mutex> lock(mutex_);
   loop_ = nullptr;
+  delete loop;  // 清理资源
 }

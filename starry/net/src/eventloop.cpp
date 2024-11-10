@@ -1,14 +1,18 @@
+#include "callbacks.h"
 #include "channel.h"
 #include "eventloop.h"
 #include "logging.h"
 #include "poller.h"
 #include "sockets_ops.h"
+#include "timer_id.h"
+#include "timer_queue.h"
 
 #include <sys/eventfd.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -37,13 +41,13 @@ EventLoop::EventLoop()
       quit_(false),
       eventHandling_(false),
       callingPendingFunctors_(false),
+      iteration_(0),
       threadId_(std::this_thread::get_id()),
-      currentActiveChannel_(nullptr),
+      poller_(Poller::newDefaultPoller(this)),
+      timerQueue_(new TimerQueue(this)),
       wakeupFd_(createEventfd()),
       wakeupChannel_(new Channel(this, wakeupFd_)),
-      iteration_(0),
-      // timerQueue_(new TimerQueue(this)),
-      poller_(Poller::newDefaultPoller(this)) {
+      currentActiveChannel_(nullptr){
   LOG_DEBUG << "EventLoop created " << this << " in thread " << threadId_;
   if (t_loopInThisThread) {
     LOG_FATAL << "Another EventLoop " << t_loopInThisThread
@@ -129,6 +133,28 @@ size_t EventLoop::queueSize() {
   return pendingFunctors_.size();
 }
 
+TimerId EventLoop::runAt(Timestamp time, TimerCallback cb) {
+  return timerQueue_->addTimer(std::move(cb), time, 0.0);
+}
+
+TimerId EventLoop::runAfter(double delay, TimerCallback cb) {
+  Timestamp time =
+      std::chrono::system_clock::now() +
+      std::chrono::nanoseconds(static_cast<int64_t>(delay * 1e9));
+  return runAt(time, std::move(cb));
+}
+
+TimerId EventLoop::runEvery(double interval, TimerCallback cb) {
+  Timestamp time =
+      std::chrono::system_clock::now() +
+      std::chrono::nanoseconds(static_cast<int64_t>(interval * 1e9));
+  return timerQueue_->addTimer(std::move(cb), time, interval);
+}
+
+void EventLoop::cancel(TimerId timerId) {
+  return timerQueue_->cancel(timerId);
+}
+
 // 调用 poller_ 的函数更新 channel
 void EventLoop::updateChannel(Channel* channel) {
   assert(channel->ownerLoop() == this);
@@ -173,7 +199,7 @@ void EventLoop::wakeup() {
 
 // 接收唤醒的哪一个字节
 void EventLoop::handleRead() {
-  uint16_t one = 1;
+  uint64_t one = 1;
   ssize_t n = sockets::read(wakeupFd_, &one, sizeof(one));
   if (n != sizeof(one)) {
     LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";

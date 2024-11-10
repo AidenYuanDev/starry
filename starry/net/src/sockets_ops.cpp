@@ -57,7 +57,7 @@ void sockets::bindOrDie(int sockfd, const struct sockaddr* addr) {
 }
 
 // 监听
-void sockets::listenOrDir(int sockfd) {
+void sockets::listenOrDie(int sockfd) {
   int ret = ::listen(sockfd, SOMAXCONN);
   if (ret < 0) {
     LOG_FATAL << "sockets::listenOrDir";
@@ -174,7 +174,7 @@ void sockets::fromIpPort(const char* ip,
   addr->sin_family = AF_INET;
   addr->sin_port = htobe16(port);
   if (::inet_pton(AF_INET, ip, &addr->sin_addr) <= 0) {
-    LOG_FATAL << "sockets::fromIpPort";
+    LOG_FATAL << "sockets::fromIpPort" << *ip << " " << port;
   }
 }
 
@@ -185,7 +185,7 @@ void sockets::fromIpPort(const char* ip,
   addr->sin6_family = AF_INET6;
   addr->sin6_port = htobe16(port);
   if (::inet_pton(AF_INET6, ip, &addr->sin6_addr) <= 0) {
-    LOG_FATAL << "sockets::fromIpPort";
+    LOG_FATAL << "sockets::fromIpPort" << *ip << " " << port;
   }
 }
 

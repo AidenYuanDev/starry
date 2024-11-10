@@ -10,7 +10,7 @@ using namespace starry;
 
 const char Buffer::kCRLF[] = "\r\n";
 
-const size_t Buffer::kCheapPreend;
+const size_t Buffer::kCheapPrepend;
 const size_t Buffer::kInitialSize;
 
 // 读取文件描述符 fd 的字符，如果读取超过 buffer 就使用备用缓冲区

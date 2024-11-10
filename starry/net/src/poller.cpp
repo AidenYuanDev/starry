@@ -1,5 +1,6 @@
 #include "poller.h"
 #include "channel.h"
+#include "epoll_poller.h"
 #include <sys/poll.h>
 
 using namespace starry;
@@ -11,4 +12,8 @@ bool Poller::hasChannel(Channel* channel) const {
   assertInLoopThread();
   auto it = channels_.find(channel->fd());
   return it != channels_.end() && it->second == channel;
+}
+
+Poller* Poller::newDefaultPoller(EventLoop *loop) {
+  return new EpollPoller(loop);
 }

@@ -6,15 +6,16 @@
 #include <chrono>
 #include <string>
 #include <strings.h>
-#include <strstream>
+#include <sstream>
 #include <sys/epoll.h>
 #include <csignal>
+#include <poll.h>
 
 using namespace starry;
 
 const int Channel::kNoneEvent = 0;
-const int Channel::kReadEvent = EPOLLIN | EPOLLPRI;
-const int Channel::kWriteEvent = POLL_OUT;
+const int Channel::kReadEvent = POLLIN | POLLPRI;
+const int Channel::kWriteEvent = POLLOUT;
 
 Channel::Channel(EventLoop* loop, int fd)
     : loop_(loop),
@@ -92,7 +93,7 @@ std::string Channel::eventsToString() const {
 }
 
 std::string Channel::eventsToString(int fd, int ev) {
-  std::ostrstream oss;
+  std::ostringstream oss;
   oss << fd << ": ";
   if (ev & EPOLLIN)
     oss << "IN ";

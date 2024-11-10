@@ -26,7 +26,11 @@ TcpServer::TcpServer(EventLoop* loop,
       threadPool_(new EventLoopThreadPool(loop, name_)),
       connectionCallback_(defaultConnectionCallback),
       messageCallback_(defaultMessageCallback),
-      nextConnId_(1) {}
+      nextConnId_(1) {
+  acceptor_->setNewConnectionCallback(std::bind(&TcpServer::newConnection, this,
+                                                std::placeholders::_1,
+                                                std::placeholders::_2));
+}
 
 TcpServer::~TcpServer() {
   loop_->assertInLoopThread();
@@ -70,7 +74,7 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr) {
   InetAddress localAddr(sockets::getLocalAddr(sockfd));
   TcpConnectionPtr conn(
       new TcpConnection(ioLoop, connName, sockfd, localAddr, peerAddr));
-  connections_[buf] = conn;
+  connections_[connName] = conn;
   conn->setConnectionCallback(connectionCallback_);
   conn->setMessageCallback(messageCallback_);
   conn->setWriteCompleteCallback(writeCompleteCallback_);
@@ -84,7 +88,7 @@ void TcpServer::removeConnection(const TcpConnectionPtr& conn) {
   loop_->runInLoop(std::bind(&TcpServer::removeConnectionInLoop, this, conn));
 }
 
-// 直接调用 erase 删除conn 
+// 直接调用 erase 删除conn
 void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn) {
   loop_->assertInLoopThread();
   LOG_INFO << "TcpServer::removeConnectionInLoop [" << name_

@@ -49,6 +49,7 @@ class Connector : public std::enable_shared_from_this<Connector> {
   void retry(int sockfd);                  // 延时开始
   int removeAndResetChannel();  // 移除 channel + 重新设置 channel
   void resetChannel();          // 重新设置 channel
+  std::string stateToString(States state);  // 状态转换成字符串
 
   EventLoop* loop_;                              // 所持有的 loop
   InetAddress serverAddr_;                       // 服务端地址

@@ -50,15 +50,14 @@ TcpConnection::TcpConnection(EventLoop* loop,
       std::bind(&TcpConnection::handleRead, this, std::placeholders::_1));
   channel_->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
   channel_->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
-  LOG_DEBUG << "TcpConnection::ctor[" <<  name_ << "] at " << this
+  LOG_DEBUG << "TcpConnection::ctor[" << name_ << "] at " << this
             << " fd=" << sockfd;
   socket_->setKeepAlive(true);
 }
 
 TcpConnection::~TcpConnection() {
-  LOG_DEBUG << "TcpConnection::dtor[" <<  name_ << "] at " << this
-            << " fd=" << channel_->fd()
-            << " state=" << stateToString();
+  LOG_DEBUG << "TcpConnection::dtor[" << name_ << "] at " << this
+            << " fd=" << channel_->fd() << " state=" << stateToString();
   assert(state_ == TcpConnection::StateE::kDisconnected);
 }
 
@@ -75,7 +74,7 @@ std::string TcpConnection::getTcpInfoString() const {
   return buf;
 }
 
-// 发送 data 
+// 发送 data
 void TcpConnection::send(const void* data, int len) {
   send(std::string_view(static_cast<const char*>(data), len));
 }
@@ -129,13 +128,13 @@ void TcpConnection::sendInLoop(const void* data, size_t len) {
       if (remaining == 0 && writeCompleteCallback_) {
         loop_->queueInLoop(
             std::bind(writeCompleteCallback_, shared_from_this()));
-      } else {
-        nwrote = 0;
-        if (errno != EWOULDBLOCK) {
-          LOG_FATAL << "TcpConnection::sendInLoop";
-          if (errno == EPIPE || errno == ECONNRESET) {
-            faultError = true;
-          }
+      }
+    } else {
+      nwrote = 0;
+      if (errno != EWOULDBLOCK) {
+        LOG_FATAL << "TcpConnection::sendInLoop";
+        if (errno == EPIPE || errno == ECONNRESET) {
+          faultError = true;
         }
       }
     }
@@ -160,7 +159,8 @@ void TcpConnection::sendInLoop(const void* data, size_t len) {
 void TcpConnection::shutdown() {
   if (state_ == StateE::kConnected) {
     setState(StateE::kDisconnecting);
-    loop_->runInLoop(std::bind(&TcpConnection::shutdownInLoop, this)); // 保证关闭操作的顺序性
+    loop_->runInLoop(std::bind(&TcpConnection::shutdownInLoop,
+                               this));  // 保证关闭操作的顺序性
   }
 }
 
@@ -227,7 +227,7 @@ void TcpConnection::startReadInLoop() {
 
 // 停止读
 void TcpConnection::stopRead() {
-  loop_->runInLoop(std::bind(&TcpConnection::startReadInLoop, this));
+  loop_->runInLoop(std::bind(&TcpConnection::stopReadInLoop, this));
 }
 
 // 停止读回调
@@ -323,5 +323,6 @@ void TcpConnection::handleError() {
   char t_errnobuf[512];
   int err = sockets::getSocketError(channel_->fd());
   LOG_ERROR << "TcpConnection::handleError [" << name_
-            << "] - SO_ERROR = " << err << " " << strerror_r(err, t_errnobuf, sizeof(t_errnobuf));
+            << "] - SO_ERROR = " << err << " "
+            << strerror_r(err, t_errnobuf, sizeof(t_errnobuf));
 }

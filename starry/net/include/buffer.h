@@ -16,12 +16,12 @@ namespace starry {
 
 class Buffer {
  public:
-  static const size_t kCheapPreend = 8;     // 预留空间
+  static const size_t kCheapPrepend = 8;     // 预留空间
   static const size_t kInitialSize = 1024;  // 初始化大小
   explicit Buffer(size_t initialSize = kInitialSize)
-      : buffer_(kCheapPreend + initialSize),
-        readerIndex_(kCheapPreend),
-        writerIndex_(kCheapPreend) {}
+      : buffer_(kCheapPrepend + initialSize),
+        readerIndex_(kCheapPrepend),
+        writerIndex_(kCheapPrepend) {}
 
   // 交换空间
   void swap(Buffer& rhs) {
@@ -128,8 +128,8 @@ class Buffer {
 
   // 移动 readerIndex_ writerIndex_
   void retrieveAll() {
-    readerIndex_ = kCheapPreend;
-    writerIndex_ = kCheapPreend;
+    readerIndex_ = kCheapPrepend;
+    writerIndex_ = kCheapPrepend;
   }
 
   // 写指针的位置
@@ -246,14 +246,14 @@ class Buffer {
 
   // 增加空间
   void makeSpace(size_t len) {
-    if (writableBytes() + prependableBytes() < len + kCheapPreend) {
+    if (writableBytes() + prependableBytes() < len + kCheapPrepend) {
       buffer_.resize(writerIndex_ + len);
     } else {
-      assert(kCheapPreend < readableBytes());
+      assert(kCheapPrepend < readableBytes());
       size_t readable = readableBytes();
       std::copy(begin() + readerIndex_, begin() + writerIndex_,
-                begin() + kCheapPreend);
-      readerIndex_ = kCheapPreend;
+                begin() + kCheapPrepend);
+      readerIndex_ = kCheapPrepend;
       writerIndex_ = readerIndex_ + readable;
       assert(readable == readableBytes());
     }

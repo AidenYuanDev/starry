@@ -6,6 +6,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstring>
+#include <poll.h>
 
 #include "callbacks.h"
 #include "channel.h"
@@ -15,6 +16,13 @@
 #include "poller.h"
 
 using namespace starry;
+
+static_assert(EPOLLIN == POLLIN,        "epoll uses same flag values as poll");
+static_assert(EPOLLPRI == POLLPRI,      "epoll uses same flag values as poll");
+static_assert(EPOLLOUT == POLLOUT,      "epoll uses same flag values as poll");
+static_assert(EPOLLRDHUP == POLLRDHUP,  "epoll uses same flag values as poll");
+static_assert(EPOLLERR == POLLERR,      "epoll uses same flag values as poll");
+static_assert(EPOLLHUP == POLLHUP,      "epoll uses same flag values as poll");
 
 const int kNew = -1;
 const int kAdded = 1;
@@ -86,6 +94,9 @@ void EpollPoller::updateChannel(Channel* channel) {
       assert(channels_.find(fd) != channels_.end());
       assert(channels_[fd] == channel);
     }
+
+    channel->setIndex(kAdded);
+    update(EPOLL_CTL_ADD, channel);
   } else {
     assert(channels_.find(fd) != channels_.end());
     assert(channels_[fd] == channel);
