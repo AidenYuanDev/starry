@@ -38,7 +38,7 @@ void AsyncLogging::append(const char* logline, int len) {
     if (nextBuffer_) {
       currentBuffer_ = std::move(nextBuffer_);
     } else {
-      currentBuffer_ = std::make_unique<Buffer>();
+      currentBuffer_ .reset(new Buffer);
     }
 
     currentBuffer_->append(std::string_view(logline, len));

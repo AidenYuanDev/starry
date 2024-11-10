@@ -18,6 +18,8 @@ target_sources(net PRIVATE
   ./src/tcp_server.cpp
   ./src/acceptor.cpp
   ./src/tcp_client.cpp
+  ./src/timer.cpp
+  ./src/timer_queue.cpp
 )
 
 target_link_libraries(net PRIVATE
@@ -26,6 +28,6 @@ target_link_libraries(net PRIVATE
   noncopyable)
 
 # 测试
-# if(BUILD_TESTING)
-#   add_subdirectory(test)
-# endif()
+if(BUILD_TESTING)
+  add_subdirectory(test)
+endif()

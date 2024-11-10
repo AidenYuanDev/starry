@@ -90,9 +90,9 @@ bool LogFile::rollFile() {
 // 获取现在的日志名称 格式：文件名 + 日期 + 进程号 + 后缀
 std::string LogFile::getLogFileName(
     const std::chrono::system_clock::time_point& now) {
-  auto now_c = std::chrono::floor<std::chrono::seconds>(now);
+  auto now_c = std::chrono::time_point_cast<std::chrono::seconds>(now);
   std::stringstream ss;
-  ss << basename_ << '.' << std::format("{:%Y%m%d-%H:%M:%S}", now_c) << '.'
+  ss << directory_ << basename_ << '.' << std::format("{:%F-%T}", now_c) << '.'
      << ::getpid() << ".log";
   return ss.str();
 }

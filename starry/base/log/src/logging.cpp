@@ -1,9 +1,9 @@
 #include <bits/chrono.h>
+#include <chrono>
 #include <cmath>
 #include <cstring>
 #include <format>
 #include <iostream>
-#include <chrono>
 #include "logging.h"
 
 namespace starry {
@@ -34,9 +34,9 @@ Logger::~Logger() {
 void Logger::finish() {
   if (level_ >= g_logLevel) {
     stream_ << " - " << location_.file_name() << ":" << location_.line();
-    auto time_c = std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
-    std::string msg = std::format("{} {} {}\n", time_c,
-                                  levelToString(level_), stream_.data());
+    auto time_c = std::chrono::system_clock::now();
+    std::string msg = std::format("{:%F %T} {} {}\n", time_c, levelToString(level_),
+                                  stream_.data());
 
     if (g_output) {
       g_output(msg.c_str(), static_cast<int>(msg.length()));

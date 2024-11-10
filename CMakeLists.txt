@@ -10,7 +10,7 @@ include(FindDependencies)
 
 # 添加子目录
 add_subdirectory(./starry/)
-add_subdirectory(./src/)
+add_subdirectory(./examples/)
 
 # 安装规则
 install(DIRECTORY include/ DESTINATION include)
