@@ -273,7 +273,7 @@ void TcpConnection::handleRead(Timestamp receiveTime) {
     handleClose();
   } else {
     errno = savedErrno;
-    LOG_FATAL << "TcpConnection::handleRead";
+    LOG_ERROR << "TcpConnection::handleRead";
     handleError();
   }
 }

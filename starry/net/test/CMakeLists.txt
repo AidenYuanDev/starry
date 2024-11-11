@@ -1,6 +1,7 @@
 add_executable(buffer_test buffer_test.cpp)
-target_link_libraries(buffer_test 
-  gtest 
+target_link_libraries(
+  buffer_test
+  gtest
   GTest::gtest_main
   log
   copyable
@@ -8,8 +9,9 @@ target_link_libraries(buffer_test
   net)
 
 add_executable(inet_address_test inet_address_test.cpp)
-target_link_libraries(inet_address_test 
-  gtest 
+target_link_libraries(
+  inet_address_test
+  gtest
   GTest::gtest_main
   log
   copyable
@@ -17,8 +19,9 @@ target_link_libraries(inet_address_test
   net)
 
 add_executable(socket_test socket_test.cpp)
-target_link_libraries(socket_test 
-  gtest 
+target_link_libraries(
+  socket_test
+  gtest
   GTest::gtest_main
   log
   copyable

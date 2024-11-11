@@ -5,7 +5,6 @@
 #include <unistd.h>
 
 int main() {
-  starry::Logger::setLogLevel(starry::LogLevel::TRACE);
   LOG_INFO << "pid = " << getpid();
   starry::EventLoop loop;
   starry::InetAddress listenAddr(2007);

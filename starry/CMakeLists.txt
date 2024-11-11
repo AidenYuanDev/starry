@@ -10,3 +10,5 @@ foreach(MODULE ${MODULES})
     add_subdirectory(${MODULE})
 endforeach()
 
+add_library(starry INTERFACE)
+
