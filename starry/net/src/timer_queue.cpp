@@ -34,7 +34,7 @@ int createTimerfd() {
 }
 
 struct timespec howMuchTimeFromNow(Timestamp when) {
-  auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(when - std::chrono::system_clock::now()); 
+  auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(when - Clock::now()); 
 
   struct timespec ts;
   ts.tv_sec = std::chrono::duration_cast<std::chrono::seconds>(nanoseconds).count();
@@ -125,7 +125,7 @@ void TimerQueue::cancelInLoop(TimerId timerId) {
 
 void TimerQueue::handleRead() {
   loop_->assertInLoopThread();
-  Timestamp now = std::chrono::system_clock::now();
+  Timestamp now = Clock::now();
   readTimerfd(timerfd_, now);
 
   std::vector<Entry> expired = getExpired(now);

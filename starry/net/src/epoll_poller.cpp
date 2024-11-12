@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include <cassert>
 #include <cerrno>
-#include <chrono>
 #include <cstddef>
 #include <cstring>
 #include <poll.h>
@@ -50,7 +49,7 @@ Timestamp EpollPoller::poll(
                                static_cast<int>(events_.size()), timeoutMs);
 
   int savedErron = errno;
-  auto now = std::chrono::system_clock::now();
+  auto now = Clock::now();
   if (numEvents > 0) {
     LOG_TRACE << numEvents << " events happened";
     fillActiveChannels(numEvents, activeChannels);

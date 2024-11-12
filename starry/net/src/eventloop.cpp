@@ -47,7 +47,7 @@ EventLoop::EventLoop()
       timerQueue_(new TimerQueue(this)),
       wakeupFd_(createEventfd()),
       wakeupChannel_(new Channel(this, wakeupFd_)),
-      currentActiveChannel_(nullptr){
+      currentActiveChannel_(nullptr) {
   LOG_DEBUG << "EventLoop created " << this << " in thread " << threadId_;
   if (t_loopInThisThread) {
     LOG_FATAL << "Another EventLoop " << t_loopInThisThread
@@ -138,16 +138,14 @@ TimerId EventLoop::runAt(Timestamp time, TimerCallback cb) {
 }
 
 TimerId EventLoop::runAfter(double delay, TimerCallback cb) {
-  Timestamp time =
-      std::chrono::system_clock::now() +
-      std::chrono::nanoseconds(static_cast<int64_t>(delay * 1e9));
+  Timestamp time = Clock::now() +
+                   std::chrono::nanoseconds(static_cast<int64_t>(delay * 1e9));
   return runAt(time, std::move(cb));
 }
 
 TimerId EventLoop::runEvery(double interval, TimerCallback cb) {
-  Timestamp time =
-      std::chrono::system_clock::now() +
-      std::chrono::nanoseconds(static_cast<int64_t>(interval * 1e9));
+  Timestamp time = Clock::now() + std::chrono::nanoseconds(
+                                      static_cast<int64_t>(interval * 1e9));
   return timerQueue_->addTimer(std::move(cb), time, interval);
 }
 
