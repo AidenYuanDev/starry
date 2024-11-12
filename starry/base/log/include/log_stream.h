@@ -9,8 +9,6 @@
 #include <string_view>
 #include <type_traits>
 
-#include "noncopyable.h"
-
 // 缓冲日志 + 接收日志
 namespace starry {
 
@@ -29,7 +27,7 @@ constexpr size_t kSmallBuffer = 4 * 1024;
 constexpr size_t kLargeBuffer = 4 * 1024 * 1024;
 
 template <size_t SIZE>
-class LogStream : noncopyable {
+class LogStream {
  public:
   LogStream() : data_(), cur_(data_.begin()) {}
 

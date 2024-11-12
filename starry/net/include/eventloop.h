@@ -14,7 +14,7 @@
 namespace starry {
 
 class Channel;
-class Poller;
+class EpollPoller;
 class TimerQueue;
 
 class EventLoop {
@@ -81,7 +81,7 @@ class EventLoop {
 
   // Poller
   Timestamp pollReturnTime_;  // poll返回时间，用来推导定时任务的结束时间
-  std::unique_ptr<Poller> poller_;                        //  在EventLoop中前向声明的对象，且只由EventLoop独占故用unique_ptr
+  std::unique_ptr<EpollPoller> epollPoller_;                        //  在EventLoop中前向声明的对象，且只由EventLoop独占故用unique_ptr
 
   // 定时器
   std::unique_ptr<TimerQueue> timerQueue_;  //  在EventLoop中前向声明的对象，且只由EventLoop独占故用unique_ptr

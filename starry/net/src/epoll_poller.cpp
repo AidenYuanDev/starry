@@ -1,3 +1,4 @@
+#include <poll.h>
 #include <strings.h>
 #include <sys/epoll.h>
 #include <unistd.h>
@@ -5,30 +6,21 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstring>
-#include <poll.h>
 
 #include "callbacks.h"
 #include "channel.h"
 #include "epoll_poller.h"
 #include "eventloop.h"
 #include "logging.h"
-#include "poller.h"
 
 using namespace starry;
-
-static_assert(EPOLLIN == POLLIN,        "epoll uses same flag values as poll");
-static_assert(EPOLLPRI == POLLPRI,      "epoll uses same flag values as poll");
-static_assert(EPOLLOUT == POLLOUT,      "epoll uses same flag values as poll");
-static_assert(EPOLLRDHUP == POLLRDHUP,  "epoll uses same flag values as poll");
-static_assert(EPOLLERR == POLLERR,      "epoll uses same flag values as poll");
-static_assert(EPOLLHUP == POLLHUP,      "epoll uses same flag values as poll");
 
 const int kNew = -1;
 const int kAdded = 1;
 const int kDeleted = 2;
 
 EpollPoller::EpollPoller(EventLoop* loop)
-    : Poller(loop),
+    : ownerLoop_(loop),
       epollfd_(::epoll_create1(EPOLL_CLOEXEC)),
       events_(kInitEventListSize) {
   if (epollfd_ < 0) {
@@ -41,9 +33,7 @@ EpollPoller::~EpollPoller() {
 }
 
 // 把监听到的活跃文件描述符通过 fillActiveChannels 放到 activeChannels中
-Timestamp EpollPoller::poll(
-    int timeoutMs,
-    ChannelList* activeChannels) {
+Timestamp EpollPoller::poll(int timeoutMs, ChannelList* activeChannels) {
   LOG_TRACE << "fd total count " << channels_.size();
   int numEvents = ::epoll_wait(epollfd_, events_.data(),
                                static_cast<int>(events_.size()), timeoutMs);
@@ -80,7 +70,7 @@ void EpollPoller::fillActiveChannels(int numEvents,
 // kNew 加入 events_, kDeleted 判断有没有删干净， kAdded
 // 没有事件就删除fd，有事件就修改
 void EpollPoller::updateChannel(Channel* channel) {
-  Poller::assertInLoopThread();
+  assertInLoopThread();
   const int index = channel->index();
   LOG_TRACE << "fd = " << channel->fd() << "events = " << channel->events()
             << " index = " << index;
@@ -111,7 +101,7 @@ void EpollPoller::updateChannel(Channel* channel) {
 
 // 把 kAdded 或 kDeleted 从events_中删除，并还原成kNew
 void EpollPoller::removeChannel(Channel* channel) {
-  Poller::assertInLoopThread();
+  assertInLoopThread();
   int fd = channel->fd();
   LOG_TRACE << "fd = " << fd;
   assert(channels_.find(fd) != channels_.end());
@@ -137,14 +127,15 @@ void EpollPoller::update(int operation, Channel* channel) {
   event.data.ptr = channel;
   int fd = channel->fd();
   LOG_TRACE << "epoll_ctl op = " << operationToString(operation)
-            << " fd = " << fd
-            << " event = { " << channel->eventsToString() << " }";
+            << " fd = " << fd << " event = { " << channel->eventsToString()
+            << " }";
   if (::epoll_ctl(epollfd_, operation, fd, &event) < 0) {
-    LOG_FATAL << "epoll_ctl op =" << operationToString(operation) << " fd " << fd;
+    LOG_FATAL << "epoll_ctl op =" << operationToString(operation) << " fd "
+              << fd;
   }
 }
 
-// 把 operation 转成 string 
+// 把 operation 转成 string
 const std::string EpollPoller::operationToString(int op) {
   switch (op) {
     case EPOLL_CTL_ADD:
@@ -157,4 +148,10 @@ const std::string EpollPoller::operationToString(int op) {
       assert(false && "ERROR op");
       return "Unknown Operation";
   }
+}
+
+bool EpollPoller::hasChannel(Channel* channel) const {
+  assertInLoopThread();
+  ChannelMap::const_iterator it = channels_.find(channel->fd());
+  return it != channels_.end() && it->second == channel;
 }

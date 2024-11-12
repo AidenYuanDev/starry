@@ -4,7 +4,6 @@ add_library(net)
 target_include_directories(net PUBLIC include)
 
 target_sources(net PRIVATE
-  ./src/poller.cpp
   ./src/epoll_poller.cpp
   ./src/channel.cpp
   ./src/sockets_ops.cpp

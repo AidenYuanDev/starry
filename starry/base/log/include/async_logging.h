@@ -8,12 +8,11 @@
 #include <thread>
 #include <vector>
 #include "log_stream.h"
-#include "noncopyable.h"
 
 // 异步日志
 namespace starry {
 
-class AsyncLogging : noncopyable {
+class AsyncLogging {
  public:
   AsyncLogging(const std::string& basename,
                const std::string& directory,

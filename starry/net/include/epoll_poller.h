@@ -1,24 +1,30 @@
 #pragma once
 
+#include <map>
 #include <vector>
 #include "channel.h"
 #include "eventloop.h"
-#include "poller.h"
+
+class Channel;
 
 namespace starry {
 
-class EpollPoller : public Poller {
+class EpollPoller {
  public:
+  using ChannelList = std::vector<Channel*>;
   EpollPoller(EventLoop* loop);
-  ~EpollPoller() override;
+  ~EpollPoller();
 
-  Timestamp poll(
-      int timeoutMs,
-      ChannelList* activeChannels) override;
-  void updateChannel(Channel* channel) override;
-  void removeChannel(Channel* channel) override;
+  Timestamp poll(int timeoutMs, ChannelList* activeChannels);
+  void updateChannel(Channel* channel);
+  void removeChannel(Channel* channel);
+  bool hasChannel(Channel* channel) const;
+  void assertInLoopThread() const {  // 断言是否在同一个线程
+    ownerLoop_->assertInLoopThread();
+  }
 
  private:
+  using ChannelMap = std::map<int, Channel*>;
   using EventList = std::vector<struct epoll_event>;
 
   // 调试
@@ -31,8 +37,10 @@ class EpollPoller : public Poller {
 
   static const int kInitEventListSize = 16;  // 初始 epoll 监听的文件数
 
-  int epollfd_;       // 创建的epollfd
-  EventList events_;  // 监听的fd
+  EventLoop* ownerLoop_;  // 所属的 EventLoop
+  int epollfd_;           // 创建的epollfd
+  EventList events_;      // 监听的fd
+  ChannelMap channels_;   // fd 对应 C
 };
 
 }  // namespace starry

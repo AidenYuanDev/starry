@@ -2,7 +2,7 @@
 #include "channel.h"
 #include "eventloop.h"
 #include "logging.h"
-#include "poller.h"
+#include "epoll_poller.h"
 #include "sockets_ops.h"
 #include "timer_id.h"
 #include "timer_queue.h"
@@ -43,7 +43,7 @@ EventLoop::EventLoop()
       callingPendingFunctors_(false),
       iteration_(0),
       threadId_(std::this_thread::get_id()),
-      poller_(Poller::newDefaultPoller(this)),
+      epollPoller_(new EpollPoller(this)),
       timerQueue_(new TimerQueue(this)),
       wakeupFd_(createEventfd()),
       wakeupChannel_(new Channel(this, wakeupFd_)),
@@ -69,7 +69,7 @@ EventLoop::~EventLoop() {
   t_loopInThisThread = nullptr;
 }
 
-// 从 poller_ 获得 activeChannels_, 处理活跃的 channel 和 预处理函数
+// 从 epollPoller_ 获得 activeChannels_, 处理活跃的 channel 和 预处理函数
 void EventLoop::loop() {
   assert(!looping_);
   assertInLoopThread();
@@ -79,7 +79,7 @@ void EventLoop::loop() {
 
   while (!quit_) {
     activeChannels_.clear();
-    pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
+    pollReturnTime_ = epollPoller_->poll(kPollTimeMs, &activeChannels_);
     ++iteration_;
     if (Logger::logLevel() <= LogLevel::TRACE) {
       printActiceChannels();
@@ -153,14 +153,14 @@ void EventLoop::cancel(TimerId timerId) {
   return timerQueue_->cancel(timerId);
 }
 
-// 调用 poller_ 的函数更新 channel
+// 调用 epollPoller_ 的函数更新 channel
 void EventLoop::updateChannel(Channel* channel) {
   assert(channel->ownerLoop() == this);
   assertInLoopThread();
-  poller_->updateChannel(channel);
+  epollPoller_->updateChannel(channel);
 }
 
-// 调用 poller_ 的函数，移除指定 channel 或者 非活跃的 channel
+// 调用 epollPoller_ 的函数，移除指定 channel 或者 非活跃的 channel
 void EventLoop::removeChannel(Channel* channel) {
   assert(channel->ownerLoop() == this);
   assertInLoopThread();
@@ -169,14 +169,14 @@ void EventLoop::removeChannel(Channel* channel) {
            std::find(activeChannels_.begin(), activeChannels_.end(), channel) ==
                activeChannels_.end());
   }
-  poller_->removeChannel(channel);
+  epollPoller_->removeChannel(channel);
 }
 
-// 调用 poller_ 的函数，查看是否有该 channel
+// 调用 epollPoller_ 的函数，查看是否有该 channel
 bool EventLoop::hasChannel(Channel* channel) {
   assert(channel->ownerLoop() == this);
   assertInLoopThread();
-  return poller_->hasChannel(channel);
+  return epollPoller_->hasChannel(channel);
 }
 
 // 打印崩溃信息

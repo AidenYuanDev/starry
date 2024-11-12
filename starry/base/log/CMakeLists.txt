@@ -9,9 +9,7 @@ target_sources(log PRIVATE
   ./src/async_logger.cpp
 )
 
-target_link_libraries(log PRIVATE
-  copyable 
-  noncopyable)
+target_link_libraries(log PRIVATE )
 
 # 测试
 if(BUILD_TESTING)
