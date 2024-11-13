@@ -53,7 +53,7 @@ void Acceptor::handleRead() {
       sockets::close(connfd);
     }
   } else {
-    LOG_FATAL << "in Acceptor::handleRead";
+    LOG_ERROR << "in Acceptor::handleRead";
     if (errno == EMFILE) {
       ::close(idleFd_);
       idleFd_ = ::accept(acceptSocket_.fd(), nullptr, nullptr);
