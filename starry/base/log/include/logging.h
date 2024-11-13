@@ -17,6 +17,10 @@ class Logger {
 
   Logger(LogLevel level,
          const std::source_location& loc = std::source_location::current());
+
+  Logger(LogLevel level,
+         int savedErrno,
+         const std::source_location& loc = std::source_location::current());
   ~Logger();
 
   SmallLogStream& stream() { return stream_; }  // 返回当前缓冲区
@@ -53,7 +57,8 @@ class Logger {
 #define LOG_WARN starry::Logger(starry::LogLevel::WARN).stream()
 #define LOG_ERROR starry::Logger(starry::LogLevel::ERROR).stream()
 #define LOG_FATAL starry::Logger(starry::LogLevel::FATAL).stream()
-
+#define LOG_SYSERR starry::Logger(starry::LogLevel::ERROR, errno).stream()
+#define LOG_SYSFATAL starry::Logger(starry::LogLevel::FATAL, errno).stream()
 // 错误处理
 
 const char* strerror_tl(int savedErrno);
