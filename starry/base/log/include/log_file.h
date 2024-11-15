@@ -13,7 +13,6 @@ namespace starry {
 class LogFile {
  public:
   LogFile(const std::string_view basename,
-          const std::string& directory,
           size_t rollSize,
           bool threadSafe = true,
           int flushInterval = 3,
@@ -30,7 +29,6 @@ class LogFile {
   std::string getLogFileName(const std::chrono::system_clock::time_point& now);
 
   const std::string basename_;                       // 文件名称
-  const std::string directory_;                      // 文件目录
   size_t rollSize_;                                  // 单文件大小上限
   int flushInterval_;                                // 刷新间隔
   int checkEveryN_;                                  // 写入频率

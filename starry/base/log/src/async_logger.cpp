@@ -1,4 +1,6 @@
 #include <chrono>
+#include <cstdio>
+#include <format>
 #include "async_logging.h"
 #include "log_file.h"
 
@@ -38,7 +40,7 @@ void AsyncLogging::append(const char* logline, int len) {
     if (nextBuffer_) {
       currentBuffer_ = std::move(nextBuffer_);
     } else {
-      currentBuffer_ .reset(new Buffer);
+      currentBuffer_.reset(new Buffer);
     }
 
     currentBuffer_->append(std::string_view(logline, len));
@@ -48,7 +50,7 @@ void AsyncLogging::append(const char* logline, int len) {
 
 // 处理存储的缓冲区，把所有的缓冲区全部写入，释放空间剩余两个，移动到当前和备用缓冲区
 void AsyncLogging::threadFunc() {
-  LogFile output(basename_, directory_, rollSize_, false);
+  LogFile output(basename_, rollSize_, false);
   BufferPtr newBuffer1 = std::make_unique<Buffer>();
   BufferPtr newBuffer2 = std::make_unique<Buffer>();
   newBuffer1->clear();
@@ -71,9 +73,12 @@ void AsyncLogging::threadFunc() {
     }
 
     if (buffersToWrite.size() > 25) {
-      // 丢弃多余的日志，保留最旧的两个和最新的一个
-      buffersToWrite.erase(buffersToWrite.begin() + 2,
-                           buffersToWrite.end() - 1);
+      std::string buf = std::format(
+          "Dropped log messages at {:%F %T}, {} larger buffers\n",
+          std::chrono::system_clock::now(), buffersToWrite.size() - 2);
+      fputs(buf.data(), stderr);
+      // 丢弃多余的日志，保留两个缓冲区
+      buffersToWrite.erase(buffersToWrite.begin() + 2, buffersToWrite.end());
     }
 
     for (const auto& buffer : buffersToWrite) {

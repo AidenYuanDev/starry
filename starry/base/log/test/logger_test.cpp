@@ -8,6 +8,23 @@
 namespace fs = std::filesystem;
 using namespace starry;
 
+// 辅助函数：字符串转日志级别
+LogLevel stringToLogLevel(const std::string& level) {
+  if (level == "TRACE")
+    return LogLevel::TRACE;
+  if (level == "DEBUG")
+    return LogLevel::DEBUG;
+  if (level == "INFO")
+    return LogLevel::INFO;
+  if (level == "WARN")
+    return LogLevel::WARN;
+  if (level == "ERROR")
+    return LogLevel::ERROR;
+  if (level == "FATAL")
+    return LogLevel::FATAL;
+  return LogLevel::INFO;  // 默认
+}
+
 class LoggerTest : public ::testing::Test {
  protected:
   std::string captured_log;
@@ -141,38 +158,85 @@ TEST_F(LoggerTest, SourceLocationInfo) {
   std::string filename = __FILE__;
   filename = filename.substr(filename.find_last_of("/\\") + 1);
 
-  // 期望的格式：" - filename:line YYYY-MM-DD HH:MM:SS INFO message"
-  std::string expected_location =
-      " - " + filename + ":" + std::to_string(current_line + 1);
-  EXPECT_TRUE(LogContains(expected_location))
-      << "Expected location info: " << expected_location << "\n"
-      << "Actual log: " << captured_log;
+  // 检查各个组成部分
+  std::regex time_re(R"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})");  // 时间戳格式
+  std::regex thread_id_re(R"(\[\w+\])");  // 线程ID格式 [12345]
+  std::regex location_re(filename + ":" +
+                         std::to_string(current_line + 1));  // 文件位置
 
-  EXPECT_TRUE(LogContains("Test message"))
-      << "Message should be present in log";
-  EXPECT_TRUE(LogContains("INFO")) << "Log level should be present";
+  // 逐个验证日志的各个部分
+  EXPECT_TRUE(std::regex_search(captured_log, time_re))
+      << "Log should contain timestamp";
+
+  EXPECT_TRUE(std::regex_search(captured_log, thread_id_re))
+      << "Log should contain thread id";
+
+  EXPECT_TRUE(std::regex_search(captured_log, location_re))
+      << "Log should contain correct file location";
+
+  EXPECT_TRUE(LogContains("INFO")) << "Log should contain level";
+
+  EXPECT_TRUE(LogContains("Test message")) << "Log should contain message";
 }
 
-// 添加日志格式综合测试
+// 日志格式综合测试
 TEST_F(LoggerTest, LogFormatting) {
   captured_log.clear();
 
   errno = EACCES;  // Permission denied
   LOG_SYSERR << "Test error message";
 
-  // Debug: 输出实际的日志内容
   std::cout << "System error log: [" << captured_log << "]\n";
 
-  // 检查各个组成部分
-  EXPECT_TRUE(LogContains(" - ")) << "Should contain separator";
-  EXPECT_TRUE(LogContains(":")) << "Should contain line number separator";
-  EXPECT_TRUE(LogContains("errno=13")) << "Should contain errno";
-  EXPECT_TRUE(LogContains("ERROR")) << "Should contain log level";
-  EXPECT_TRUE(LogContains("Test error message")) << "Should contain message";
+  // 修改正则表达式以匹配实际格式
+  std::regex log_format_re(R"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})"  // 时间戳
+                           R"( \[\d+\] )"            // 线程ID [数字]
+                           R"(ERROR )"               // 日志级别
+                           R"(.*\(errno=13\))"       // 错误信息
+                           R"( Test error message)"  // 用户消息
+                           R"( - .*:\d+\n)"          // 文件名:行号
+  );
 
-  // 检查时间格式
-  std::regex time_pattern(R"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})");
-  std::smatch match;
-  EXPECT_TRUE(std::regex_search(captured_log, match, time_pattern))
-      << "Should contain properly formatted timestamp";
+  EXPECT_TRUE(std::regex_search(captured_log, log_format_re))
+      << "Log format should match expected pattern\n"
+      << "Actual log: " << captured_log;
+}
+
+// 多日志级别的格式测试
+TEST_F(LoggerTest, MultiLevelFormatting) {
+  captured_log.clear();
+
+  LOG_INFO << "Info message";
+  LOG_WARN << "Warning message";
+  LOG_ERROR << "Error message";
+
+  std::string log_content = captured_log;
+  std::cout << "Multi-level log content: [" << log_content << "]\n";
+
+  // 检查每个级别
+  std::vector<std::pair<std::string, std::string>> levels = {
+      {"INFO", "Info message"},
+      {"WARN", "Warning message"},
+      {"ERROR", "Error message"}};
+
+  for (const auto& [level, message] : levels) {
+    // 构建完整的正则表达式字符串
+    std::string pattern = R"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})"  // 时间戳
+                          R"( \[\d+\] )" +  // 线程ID [数字]
+                          level +
+                          " " +              // 日志级别
+                          message +          // 消息内容
+                          R"( - .*:\d+\n)";  // 文件名:行号
+
+    std::regex level_format_re(pattern);
+
+    if (Logger::logLevel() <= stringToLogLevel(level)) {
+      EXPECT_TRUE(std::regex_search(log_content, level_format_re))
+          << level << " format should be correct\n"
+          << "Actual log: " << log_content;
+    } else {
+      EXPECT_FALSE(std::regex_search(log_content, level_format_re))
+          << level << " should not appear in log";
+    }
+  }
 }

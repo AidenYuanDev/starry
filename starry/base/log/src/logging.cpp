@@ -1,12 +1,13 @@
 #include <bits/chrono.h>
 #include <chrono>
 #include <cmath>
-#include <cstddef>
+#include <cstdlib>
 #include <cstring>
 #include <format>
 #include <iostream>
 #include <source_location>
 #include <string>
+#include <string_view>
 #include <thread>
 #include "logging.h"
 
@@ -24,50 +25,37 @@ LogLevel Logger::g_logLevel = LogLevel::INFO;
 Logger::OutputFunc Logger::g_output = [](const char* msg, int len) {
   std::cout.write(msg, len);
 };
-// 默认异步写入
+// 默认同步刷新
 Logger::FlushFunc Logger::g_flush = [] { std::cout.flush(); };
 
 Logger::Logger(LogLevel level, const std::source_location& loc)
-    : level_(level), stream_(), location_(loc) {}
+    : level_(level), stream_(), location_(loc) {
+  auto time_c = std::chrono::time_point_cast<std::chrono::seconds>(
+      std::chrono::system_clock::now());
+  stream_ << std::format("{:%F %T }", time_c);
+  stream_ << "[" << std::this_thread::get_id() << "] " << levelToString(level_);
+}
 
 Logger::Logger(LogLevel level, int saveErrno, const std::source_location& loc)
-    : level_(level), stream_(), location_(loc) {
-  stream_ << std::this_thread::get_id();
-  stream_ << levelToString(level);
+    : Logger(level, loc) {
   if (saveErrno != 0) {
     stream_ << strerror_tl(saveErrno) << " (errno=" << saveErrno << ") ";
   }
 }
 Logger::~Logger() {
   finish();
+  std::string_view buf = stream().data();
+  g_output(buf.data(), buf.length());
+  if (level_ == LogLevel::FATAL) {
+    g_flush();
+    abort();
+  }
 }
 
 // 这条日志比g_logLevel高才可以输出,比ERROR的才可以刷新，超时刷新在async_logging
 void Logger::finish() {
-  if (level_ >= g_logLevel) {
-    std::string filename = location_.file_name();
-    size_t last_slash = filename.find_last_of("/\\");
-    if (last_slash != std::string::npos) {
-      filename = filename.substr(last_slash + 1);
-    }
-    auto time_c = std::chrono::system_clock::now();
-    std::string msg =
-        std::format(" - {}:{} {:%F %T} {} {}\n", filename, location_.line(),
-                    time_c, levelToString(level_), stream_.data());
-
-    if (g_output) {
-      g_output(msg.c_str(), static_cast<int>(msg.length()));
-    }
-
-    if (level_ >= LogLevel::ERROR && g_flush) {
-      g_flush();
-    }
-
-    if (level_ == LogLevel::FATAL) {
-      g_flush();
-      std::abort();
-    }
-  }
+  std::string filename = location_.file_name();
+  stream_ << " - " << filename.substr(filename.find_last_of('/') + 1) << ":" << location_.line() << "\n";
 }
 
 void Logger::setLogLevel(LogLevel level) {
@@ -89,19 +77,19 @@ void Logger::setFlush(FlushFunc flush) {
 std::string Logger::levelToString(LogLevel level) {
   switch (level) {
     case LogLevel::TRACE:
-      return "TRACE";
+      return "TRACE ";
     case LogLevel::DEBUG:
-      return "DEBUG";
+      return "DEBUG ";
     case LogLevel::INFO:
       return "INFO ";
     case LogLevel::WARN:
       return "WARN ";
     case LogLevel::ERROR:
-      return "ERROR";
+      return "ERROR ";
     case LogLevel::FATAL:
-      return "FATAL";
+      return "FATAL ";
     default:
-      return "UNKNOWN";
+      return "UNKNOWN ";
   }
 }
 

@@ -8,13 +8,11 @@ namespace starry {
 
 // 判断日志文件名是否合法
 LogFile::LogFile(const std::string_view basename,
-                 const std::string& directory,
                  size_t rollSize,
                  bool threadSafe,
                  int flushInterval,
                  int checkEveryN)
     : basename_(basename),
-      directory_(directory),
       rollSize_(rollSize),
       flushInterval_(flushInterval),
       checkEveryN_(checkEveryN),
@@ -92,7 +90,7 @@ std::string LogFile::getLogFileName(
     const std::chrono::system_clock::time_point& now) {
   auto now_c = std::chrono::time_point_cast<std::chrono::seconds>(now);
   std::stringstream ss;
-  ss << directory_ << basename_ << '.' << std::format("{:%F-%T}", now_c) << '.'
+  ss << basename_ << '.' << std::format("{:%Y%m%d-%H%M%S}", now_c) << '.'
      << ::getpid() << ".log";
   return ss.str();
 }
