@@ -15,7 +15,6 @@ namespace starry {
 class AsyncLogging {
  public:
   AsyncLogging(const std::string& basename,
-               const std::string& directory,
                off_t rollSize,
                int flushInterval = 3);
   ~AsyncLogging();

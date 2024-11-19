@@ -7,13 +7,11 @@
 namespace starry {
 
 AsyncLogging::AsyncLogging(const std::string& basename,
-                           const std::string& directory,
                            off_t rollSize,
                            int flushInterval)
     : flushInterval_(flushInterval),
       running_(false),
       basename_(basename),
-      directory_(directory),
       rollSize_(rollSize),
       thread_(),
       currentBuffer_(std::make_unique<Buffer>()),

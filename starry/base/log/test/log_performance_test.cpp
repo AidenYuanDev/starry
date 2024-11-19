@@ -29,7 +29,7 @@ class LogPerformanceTest : public ::testing::Test {
   void SetUp() override {
     // 初始化异步日志系统
     asyncLog_ =
-        std::make_unique<AsyncLogging>("test_log", "/tmp", 64 * 1024 * 1024);
+        std::make_unique<AsyncLogging>("test_log", 64 * 1024 * 1024);
     asyncLog_->start();
 
     // 设置日志输出到异步日志
