@@ -34,7 +34,6 @@ class AsyncLogging {
   const int flushInterval_;       // 刷新间隔
   std::atomic<bool> running_;     // 运行
   const std::string basename_;    // 文件名称
-  const std::string directory_;   // 文件目录
   const off_t rollSize_;          // 文件大小
   std::thread thread_;            // 线程
   std::mutex mutex_;              // 锁
