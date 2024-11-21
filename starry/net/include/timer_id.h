@@ -13,8 +13,8 @@ class TimerId {
   friend class TimerQueue;
 
  private:
-  Timer* timer_;
-  int64_t sequence_;
+  Timer* timer_;      // 指向实际的Timer 对象
+  int64_t sequence_;  // 序列号，用于区分同一个 Timer 对象的不同实例
 };
 
 }  // namespace starry
