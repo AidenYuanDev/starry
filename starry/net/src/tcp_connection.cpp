@@ -115,7 +115,7 @@ void TcpConnection::sendInLoop(const std::string_view& message) {
 void TcpConnection::sendInLoop(const void* data, size_t len) {
   loop_->assertInLoopThread();
   ssize_t nwrote = 0;
-  size_t remaining = len;
+  size_t remaining = len; // 剩余未发送的字节数
   bool faultError = false;
   if (state_ == StateE::kDisconnected) {
     LOG_WARN << "disconnected, give up writing";
@@ -140,6 +140,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len) {
     }
   }
 
+  // 如果一个发不完，就放到 outputBuffer_ 中，让 handleWrite 自动触发完成发送工作
   assert(remaining <= len);
   if (!faultError && remaining > 0) {
     size_t oldLen = outputBuffer_.readableBytes();
