@@ -60,6 +60,7 @@ TcpClient::~TcpClient() {
     }
   } else {
     connector_->stop();
+    loop_->runAfter(1, std::bind(&detail::removeConnector, connector_));
     // 等定时器的实现
   }
 }

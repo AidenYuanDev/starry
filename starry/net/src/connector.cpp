@@ -5,8 +5,8 @@
 #include "logging.h"
 #include "sockets_ops.h"
 
-#include <algorithm>
 #include <errno.h>
+#include <algorithm>
 #include <cassert>
 #include <functional>
 
@@ -134,7 +134,7 @@ void Connector::resetChannel() {
   channel_.reset();
 }
 
-// 写回调 -- 处理写可能发生的异常状态
+// 写回调 -- 如果不发生异常就返回 TcpClient 执行 连接回调 初始化TcpConnection
 void Connector::handleWrite() {
   LOG_TRACE << "Connector::handleWrite " << stateToString(state_);
 
@@ -177,9 +177,11 @@ void Connector::retry(int sockfd) {
   sockets::close(sockfd);
   setState(States::kDisconnected);
   if (connect_) {
-    LOG_INFO << "Connector::retry - Retry connecting to " << serverAddr_.toIpPort()
-             << " in " << retryDelayMs_ << " milliseconds. ";
-    loop_->runAfter(retryDelayMs_ / 1000.0, std::bind(&Connector::startInLoop, shared_from_this()));
+    LOG_INFO << "Connector::retry - Retry connecting to "
+             << serverAddr_.toIpPort() << " in " << retryDelayMs_
+             << " milliseconds. ";
+    loop_->runAfter(retryDelayMs_ / 1000.0,
+                    std::bind(&Connector::startInLoop, shared_from_this()));
     retryDelayMs_ = std::min(retryDelayMs_ * 2, kMaxRetryDelayMs);
   } else {
     LOG_DEBUG << "do not connect";
