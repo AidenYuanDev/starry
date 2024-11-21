@@ -23,8 +23,8 @@ class Socket {
 
   void shutdownWrite();         // 半连接，只收取不发送
   void setTcpNoDelay(bool on);  //  是否开启 nagle 算法
-  void setReuseAddr(bool on);   // 是否开启端口复用
-  void setReusePort(bool on);   // 是否开启端口复用
+  void setReuseAddr(bool on);   // 允许快速重启服务器，不等待TIME_WAIT状态结束
+  void setReusePort(bool on);   // 允许多个套接字绑定到同一IP和端口
   void setKeepAlive(bool on);   // 是否开\开启心跳检测
 
  private:
