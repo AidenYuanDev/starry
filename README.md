@@ -58,7 +58,7 @@ net部分的改动的地方就少很多了。
 
 ### 数据的处理
 
-我这里的实现比`muduo` 简洁了不少，使用了模板(c++20 concept)
+我这里的实现比`muduo` 简洁了不少，使用了模板
 
 #### 需求分析
 
@@ -68,8 +68,12 @@ net部分的改动的地方就少很多了。
 
 对于`muduo` 把大部分类型都重载不同我则是我数据分为了两类，通过模板进行了更简洁的实现。
 
-- **OstreamOutputtable** ：不是类型退化后 `char*`以外的指针，并且可以被ostringstream正确识别的数据类型。
-- **AddressPrintablePointer** ：是类型退化后 `char*`以外的指针。
+使用编译期判断 `if constexpr`
+
+- 指针类型： 去除cv 和指针
+  - char：输出字符串
+  - 普通指针：输出地址
+- 非指针类型：直接交给`ostringstream`
 
 ## Logger
 
@@ -525,3 +529,11 @@ bool operator <(const TimerId timerid) const {
 
 我对`echo` 做了修改，返回`Http 20` 即可用`wrk` 测试性能
 也轻松可达百万并发
+
+相比原`muduo` 性能提升约 10%
+
+可以自行参考`examples/simple` 的设计,修改 `muduo` 做对应性能测试。
+
+```base
+wrk -t12 -c800 -d30s http://127.0.0.1:2007/
+```
