@@ -50,6 +50,7 @@ TcpConnection::TcpConnection(EventLoop* loop,
       std::bind(&TcpConnection::handleRead, this, std::placeholders::_1));
   channel_->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
   channel_->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
+  channel_->setErrorCallback(std::bind(&TcpConnection::handleError, this));
   LOG_DEBUG << "TcpConnection::ctor[" << name_ << "] at " << this
             << " fd=" << sockfd;
   socket_->setKeepAlive(true);
@@ -115,7 +116,7 @@ void TcpConnection::sendInLoop(const std::string_view& message) {
 void TcpConnection::sendInLoop(const void* data, size_t len) {
   loop_->assertInLoopThread();
   ssize_t nwrote = 0;
-  size_t remaining = len; // 剩余未发送的字节数
+  size_t remaining = len;  // 剩余未发送的字节数
   bool faultError = false;
   if (state_ == StateE::kDisconnected) {
     LOG_WARN << "disconnected, give up writing";
@@ -140,7 +141,8 @@ void TcpConnection::sendInLoop(const void* data, size_t len) {
     }
   }
 
-  // 如果一个发不完，就放到 outputBuffer_ 中，让 handleWrite 自动触发完成发送工作
+  // 如果一个发不完，就放到 outputBuffer_ 中，让 handleWrite
+  // 自动触发完成发送工作
   assert(remaining <= len);
   if (!faultError && remaining > 0) {
     size_t oldLen = outputBuffer_.readableBytes();
@@ -274,7 +276,7 @@ void TcpConnection::handleRead(Timestamp receiveTime) {
     handleClose();
   } else {
     errno = savedErrno;
-    LOG_ERROR << "TcpConnection::handleRead";
+    LOG_SYSERR << "TcpConnection::handleRead";
     handleError();
   }
 }
@@ -321,9 +323,7 @@ void TcpConnection::handleClose() {
 
 // 处理错误
 void TcpConnection::handleError() {
-  char t_errnobuf[512];
   int err = sockets::getSocketError(channel_->fd());
   LOG_ERROR << "TcpConnection::handleError [" << name_
-            << "] - SO_ERROR = " << err << " "
-            << strerror_r(err, t_errnobuf, sizeof(t_errnobuf));
+            << "] - SO_ERROR = " << err << " " << strerror_tl(err);
 }

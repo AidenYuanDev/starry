@@ -1,0 +1,62 @@
+Date : 2024-11-22 03:28:40
+Directory : /home/aiden/Development/starry/starry
+Total : 25 files,  97 codes, 34 comments, 13 blanks, all 144 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C++      |         21 |         96 |         34 |         12 |        142 |
+| CMake    |          4 |          1 |          0 |          1 |          2 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                         | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                            |         25 |         97 |         34 |         13 |        144 |
+| . (Files)                                                                    |          1 |          1 |          0 |          1 |          2 |
+| base                                                                         |         10 |        117 |         14 |         24 |        155 |
+| base/log                                                                     |         10 |        117 |         14 |         24 |        155 |
+| base/log (Files)                                                             |          1 |         -2 |          0 |          0 |         -2 |
+| base/log/include                                                             |          4 |         -1 |          0 |         -1 |         -2 |
+| base/log/src                                                                 |          3 |          9 |          0 |         -3 |          6 |
+| base/log/test                                                                |          2 |        111 |         14 |         28 |        153 |
+| net                                                                          |         14 |        -21 |         20 |        -12 |        -13 |
+| net (Files)                                                                  |          1 |         -1 |          0 |          0 |         -1 |
+| net/include                                                                  |          5 |        -18 |          2 |         -9 |        -25 |
+| net/src                                                                      |          7 |         -5 |         18 |         -3 |         10 |
+| net/test                                                                     |          1 |          3 |          0 |          0 |          3 |
++------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                     | language | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| /home/aiden/Development/starry/starry/CMakeLists.txt                         | CMake    |          1 |          0 |          1 |          2 |
+| /home/aiden/Development/starry/starry/base/log/CMakeLists.txt                | CMake    |         -2 |          0 |          0 |         -2 |
+| /home/aiden/Development/starry/starry/base/log/include/async_logging.h       | C++      |         -3 |          0 |          0 |         -3 |
+| /home/aiden/Development/starry/starry/base/log/include/log_file.h            | C++      |         -2 |          0 |          0 |         -2 |
+| /home/aiden/Development/starry/starry/base/log/include/log_stream.h          | C++      |         -1 |          0 |         -1 |         -2 |
+| /home/aiden/Development/starry/starry/base/log/include/logging.h             | C++      |          5 |          0 |          0 |          5 |
+| /home/aiden/Development/starry/starry/base/log/src/async_logger.cpp          | C++      |          3 |          0 |          0 |          3 |
+| /home/aiden/Development/starry/starry/base/log/src/log_file.cpp              | C++      |         -2 |          0 |          0 |         -2 |
+| /home/aiden/Development/starry/starry/base/log/src/logging.cpp               | C++      |          8 |          0 |         -3 |          5 |
+| /home/aiden/Development/starry/starry/base/log/test/log_performance_test.cpp | C++      |         10 |          0 |          0 |         10 |
+| /home/aiden/Development/starry/starry/base/log/test/logger_test.cpp          | C++      |        101 |         14 |         28 |        143 |
+| /home/aiden/Development/starry/starry/net/CMakeLists.txt                     | CMake    |         -1 |          0 |          0 |         -1 |
+| /home/aiden/Development/starry/starry/net/include/callbacks.h                | C++      |          1 |          0 |          0 |          1 |
+| /home/aiden/Development/starry/starry/net/include/epoll_poller.h             | C++      |          7 |          0 |          1 |          8 |
+| /home/aiden/Development/starry/starry/net/include/poller.h                   | C++      |        -28 |         -2 |        -11 |        -41 |
+| /home/aiden/Development/starry/starry/net/include/timer.h                    | C++      |          1 |          0 |          1 |          2 |
+| /home/aiden/Development/starry/starry/net/include/timer_queue.h              | C++      |          1 |          4 |          0 |          5 |
+| /home/aiden/Development/starry/starry/net/src/connector.cpp                  | C++      |          2 |          0 |          0 |          2 |
+| /home/aiden/Development/starry/starry/net/src/epoll_poller.cpp               | C++      |         -4 |          0 |          0 |         -4 |
+| /home/aiden/Development/starry/starry/net/src/eventloop.cpp                  | C++      |         -2 |          0 |          0 |         -2 |
+| /home/aiden/Development/starry/starry/net/src/poller.cpp                     | C++      |        -15 |          0 |         -5 |        -20 |
+| /home/aiden/Development/starry/starry/net/src/tcp_client.cpp                 | C++      |          1 |          0 |          0 |          1 |
+| /home/aiden/Development/starry/starry/net/src/tcp_connection.cpp             | C++      |          0 |          1 |          0 |          1 |
+| /home/aiden/Development/starry/starry/net/src/timer_queue.cpp                | C++      |         13 |         17 |          2 |         32 |
+| /home/aiden/Development/starry/starry/net/test/CMakeLists.txt                | CMake    |          3 |          0 |          0 |          3 |
+| Total                                                                        |          |         97 |         34 |         13 |        144 |
++------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

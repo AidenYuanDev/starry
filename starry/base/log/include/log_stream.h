@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <concepts>
 #include <cstring>
 #include <format>
 #include <sstream>
@@ -12,17 +11,6 @@
 // 缓冲日志 + 接收日志
 namespace starry {
 
-template <typename T>
-concept OstreamOutputtable =
-    (!std::is_pointer_v<T> || std::is_same_v<std::decay_t<T>, char*>) &&
-    requires(std::ostringstream& oss, T value) {
-      { oss << value } -> std::convertible_to<std::ostream&>;
-    };
-
-// 处理除了字符串以外的指针
-template <typename T>
-concept AddressPrintablePointer =
-    std::is_pointer_v<T> && !std::is_same_v<std::decay_t<T>, char*>;
 constexpr size_t kSmallBuffer = 4 * 1024;
 constexpr size_t kLargeBuffer = 4 * 1024 * 1024;
 
@@ -31,22 +19,30 @@ class LogStream {
  public:
   LogStream() : data_(), cur_(data_.begin()) {}
 
-  // 模板接收日志
-  // 处理指针
-  LogStream& operator<<(AddressPrintablePointer auto const& value) {
-    if (value == nullptr) {
-      append("(null)");
-    } else {
-      append(std::format("{}", static_cast<const void*>(value)));
+  // 使用单个泛型操作符处理所有输出情况
+  LogStream& operator<<(const auto& value) {
+    using TypeNoCV = std::remove_cvref_t<std::remove_pointer_t<decltype(value)>>;
+    // 首先判断是否是指针类型
+    if constexpr (std::is_pointer_v<decltype(value)>) {
+      // 如果是字符指针（char* 或 const char*），我们输出字符串内容
+      if constexpr (std::is_same_v<TypeNoCV, char>) {
+        if (value) {
+          append(std::string_view(value, strlen(value)));
+        } else {
+          append("(null)");
+        }
+      } else {  // 对于其他类型的指针，我们输出其地址
+        if (value) {
+          append(std::format("{}", static_cast<const void*>(value)));
+        } else {
+          append("(null)");
+        }
+      }
+    } else {  // 对于非指针类型，直接使用流进行输出
+      std::ostringstream oss;
+      oss << value;
+      append(oss.str());
     }
-    return *this;
-  }
-
-  // 处理所有可以输出到流的类型（包括字符串、数字等）
-  LogStream& operator<<(OstreamOutputtable auto const& value) {
-    std::ostringstream oss;
-    oss << value;
-    append(oss.str());
     return *this;
   }
 

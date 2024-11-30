@@ -34,15 +34,15 @@ void EchoServer::onMessage(const starry::TcpConnectionPtr& conn,
                            starry::Timestamp) {
   std::string msg(buf->retrieveAllAsString());
   LOG_INFO << conn->name() << " received " << msg.size() << " bytes ";
-  // std::string response =
-  //     "HTTP/1.1 200 OK\r\n"
-  //     "Content-Type: text/plain\r\n"
-  //     "Content-Length: " +
-  //     std::to_string(msg.size()) +
-  //     "\r\n"
-  //     "Connection: keep-alive\r\n"
-  //     "\r\n" +
-  //     msg;
+  std::string response =
+      "HTTP/1.1 200 OK\r\n"
+      "Content-Type: text/plain\r\n"
+      "Content-Length: " +
+      std::to_string(msg.size()) +
+      "\r\n"
+      "Connection: keep-alive\r\n"
+      "\r\n" +
+      msg;
 
-  conn->send(msg);
+  conn->send(response);
 }
