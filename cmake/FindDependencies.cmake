@@ -18,3 +18,6 @@ endif()
 
 # 添加 protobuf 
 find_package(Protobuf)
+
+# 添加 zlib
+find_package(ZLIB)
