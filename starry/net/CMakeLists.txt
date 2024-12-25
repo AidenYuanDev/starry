@@ -26,6 +26,8 @@ target_link_libraries(net PRIVATE
   copyable 
   noncopyable)
 
+add_subdirectory(./protobuf/)
+
 # 测试
 if(BUILD_TESTING)
   add_subdirectory(test)

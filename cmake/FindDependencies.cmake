@@ -15,3 +15,6 @@ set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
 set(BUILD_GTEST ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 endif()
+
+# 添加 protobuf 
+find_package(Protobuf)
