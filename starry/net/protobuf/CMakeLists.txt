@@ -7,6 +7,7 @@ target_sources(protobuf_codec PRIVATE
 
 target_link_libraries(protobuf_codec PROVATE
   net 
+  log 
   protobuf
   z
 )
