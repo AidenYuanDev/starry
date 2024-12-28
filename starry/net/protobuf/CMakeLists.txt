@@ -9,5 +9,6 @@ target_link_libraries(protobuf_codec PROVATE
   net 
   log 
   protobuf
+  protorpc
   z
 )
