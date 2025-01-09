@@ -1,8 +1,8 @@
-add_library(protorpc)
+add_library(protorpc
+        src/rpc_channel.cpp)
 
 target_include_directories(protorpc PUBLIC include)
 target_sources(protorpc PRIVATE
-  ./src/rpc_codec.cpp
 )
 
 target_link_libraries(protorpc PROVATE
