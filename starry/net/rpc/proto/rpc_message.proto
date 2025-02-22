@@ -1,0 +1,71 @@
+// rpc_message.proto
+syntax = "proto3";
+
+// RPC框架的核心协议定义
+package rpc.core;
+
+// RPC消息：所有RPC通信的基本消息格式
+message RpcMessage {
+    // 消息类型
+    enum Type {
+        // 未指定类型，protobuf要求第一个枚举值为0
+        TYPE_UNSPECIFIED = 0;
+        // RPC请求消息
+        REQUEST = 1;
+        // RPC响应消息
+        RESPONSE = 2;
+        // RPC错误消息
+        ERROR = 3;
+    }
+
+    // 消息类型，必填
+    Type type = 1;
+
+    // 请求ID，用于匹配请求和响应
+    uint64 id = 2;
+
+    // 服务名称，用于服务路由
+    string service = 3;
+
+    // 方法名称，用于方法调用
+    string method = 4;
+
+    // 序列化后的请求/响应数据
+    bytes payload = 5;
+
+    // 错误信息，仅在type为ERROR时有效
+    string error = 6;
+}
+
+// RPC错误码：标准化错误处理
+enum ErrorCode {
+    // 未指定错误
+    ERROR_UNSPECIFIED = 0;
+    
+    // 系统级错误
+    INVALID_REQUEST = 100;      // 无效请求
+    SERVICE_NOT_FOUND = 101;    // 服务未找到
+    METHOD_NOT_FOUND = 102;     // 方法未找到
+    INTERNAL_ERROR = 103;       // 内部错误
+    TIMEOUT = 104;              // 调用超时
+    
+    // 调用级错误
+    INVALID_ARGUMENT = 200;     // 无效参数
+    SERIALIZE_ERROR = 201;      // 序列化错误
+    DESERIALIZE_ERROR = 202;    // 反序列化错误
+    
+    // 业务级错误
+    BUSINESS_ERROR = 300;       // 业务错误
+}
+
+// RPC控制信息：可选的元数据
+message RpcMetadata {
+    // 超时时间（毫秒）
+    uint32 timeout_ms = 1;
+    
+    // 调用追踪ID
+    string trace_id = 2;
+    
+    // 附加信息
+    map<string, string> extra = 3;
+}
