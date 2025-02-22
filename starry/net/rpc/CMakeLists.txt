@@ -16,6 +16,9 @@ target_sources(rpc PRIVATE
   ${PROTO_HDRS}
   ${PROTO_SRCS}
   ./codec.cpp
+  ./rpc_channel.cpp
+  ./rpc_controller.cpp
+  ./rpc_server.cpp
 )
 
 target_link_libraries(rpc PRIVATE
@@ -23,3 +26,8 @@ target_link_libraries(rpc PRIVATE
   log
   ${Protobuf_LIBRARIES}
 )
+
+# 测试
+if(BUILD_TESTING)
+  add_subdirectory(test)
+endif()

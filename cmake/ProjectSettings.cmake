@@ -9,7 +9,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # 是否启用测试 ON or OFF
-option(BUILD_TESTING "Build the testing tree." OFF)
+option(BUILD_TESTING "Build the testing tree." ON)
 enable_testing()
 
 # 设置输出目录
