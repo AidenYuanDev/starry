@@ -1,7 +1,6 @@
 # 列出所有模块
 set(MODULES
-  ./simple/
-  ./rpc/
+  # ./echo/
     # 添加其他模块...
 )
 

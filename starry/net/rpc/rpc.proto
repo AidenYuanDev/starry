@@ -1,0 +1,33 @@
+syntax = "proto3";  // 使用 proto3 语法
+
+package starry;
+
+// 消息类型枚举
+enum MessageType {
+    UNKNOWN = 0;    // proto3 要求枚举的第一个值必须是0
+    REQUEST = 1;    // RPC请求
+    RESPONSE = 2;   // RPC响应
+    ERROR = 3;      // 错误响应
+}
+
+// 错误码枚举
+enum ErrorCode {
+    NO_ERROR = 0;        // 无错误
+    WRONG_PROTO = 1;     // 协议错误
+    NO_SERVICE = 2;      // 服务不存在
+    NO_METHOD = 3;       // 方法不存在
+    INVALID_REQUEST = 4; // 无效请求
+    INVALID_RESPONSE = 5;// 无效响应
+    TIMEOUT = 6;        // 超时
+}
+
+// RPC消息定义
+message RpcMessage {
+    MessageType type = 1;    
+    uint64 id = 2;          // 使用uint64替代fixed64，更灵活
+    string service = 3;     // 服务名
+    string method = 4;      // 方法名
+    bytes request = 5;      // 请求数据
+    bytes response = 6;     // 响应数据
+    ErrorCode error = 7;    // 错误码
+}
