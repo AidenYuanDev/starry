@@ -20,6 +20,10 @@ include(FetchContent)
 find_package(Protobuf REQUIRED)
 include_directories(${Protobuf_INCLUDE_DIRS})
 
+# 使用 pkg-config 查找 abseil
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(ABSL IMPORTED_TARGET absl_raw_hash_set absl_hash absl_log absl_log_internal_check_op)
+
 # 添加 zlib
 find_package(ZLIB)
 

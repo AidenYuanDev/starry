@@ -1,33 +1,33 @@
-set(PROTO_FILES
-  ./rpc.proto
+add_subdirectory(./tool/)
+
+# 设置输出目录
+set(PROTO_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
+file(MAKE_DIRECTORY ${PROTO_OUT_DIR})
+
+add_library(rpc
+  ./protobuf_codec_lite.cpp
+  ./rpc_channel.cpp
+  ./rpc_codec.cpp
 )
 
-# 生成 RPC 框架代码
-
-protobuf_generate_cpp(RPC_SRCS RPC_HDRS ${PROTO_FILES})
-
-add_library(rpc)
+file(GLOB PROTO_FILES "${CMAKE_CURRENT_SOURCE_DIR}/protos/*.proto")
+protobuf_generate(
+  TARGET rpc
+  PLUGIN "protoc-gen-cpp-plugin=$<TARGET_FILE:gen-cpp-plugin>"
+  IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/protos
+  PROTOC_OUT_DIR ${PROTO_OUT_DIR}
+  PROTOS ${PROTO_FILES}
+)
 
 target_include_directories(rpc PUBLIC
-  .
-  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${Protobuf_INCLUDE_DIRS}
+  ${PROTO_OUT_DIR}
 )
 
-target_sources(rpc PRIVATE
-  ${RPC_HDRS}
-  ${RPC_SRCS}
-  ./protobuf_codec_lite.cpp
-)
-
-target_link_libraries(rpc PRIVATE
-  net
-  log
+target_link_libraries(rpc PUBLIC
   ${Protobuf_LIBRARIES}
+  PkgConfig::ABSL
+  net 
+  log
 )
-
-# add_subdirectory(./tools/)
-
-# 测试
-if(BUILD_TESTING)
-  add_subdirectory(test)
-endif()

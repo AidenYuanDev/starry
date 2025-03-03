@@ -95,22 +95,22 @@ class RpcGenerate : public google::protobuf::compiler::CodeGenerator {
   }
 };
 
-const char kThickSeparator[] =
-    "// ===================================================================\n";
-const char kThinSeparator[] =
-    "// -------------------------------------------------------------------\n";
+// const char kThickSeparator[] =
+//     "// ===================================================================\n";
+// const char kThinSeparator[] =
+//     "// -------------------------------------------------------------------\n";
 
-std::string ClassName(const google::protobuf::Descriptor* descriptor, bool) {
-  return descriptor->name();
-}
-
-std::string StripProto(const std::string& filename) {
-  if (filename.length() >= 6 &&
-      filename.compare(filename.length() - 6, 6, ".proto") == 0) {
-    return filename.substr(0, filename.length() - 6);
-  }
-  return filename;
-}
+// std::string ClassName(const google::protobuf::Descriptor* descriptor, bool) {
+//   return descriptor->name();
+// }
+//
+// std::string StripProto(const std::string& filename) {
+//   if (filename.length() >= 6 &&
+//       filename.compare(filename.length() - 6, 6, ".proto") == 0) {
+//     return filename.substr(0, filename.length() - 6);
+//   }
+//   return filename;
+// }
 
 }  // namespace compiler
 }  // namespace starry

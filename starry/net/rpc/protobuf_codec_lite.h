@@ -98,10 +98,13 @@ class ProtobufCodecLite {
   const int kMinMessageLen;
 };
 
-template <typename MSG, const char* TAG>
+template <typename MSG, const char* TAG, typename CODEC = ProtobufCodecLite>
 class ProtobufCodecLiteT {
-  static_assert(std::is_base_of_v<google::protobuf::Message, MSG>,
-                "MSG must be derived from google::protobuf::Message");
+  // static_assert(std::is_base_of_v<google::protobuf::Message, MSG>,
+  // "MSG must be derived from google::protobuf::Message");
+  template <typename T>
+  using EnableIfMessage =
+      std::enable_if_t<std::is_base_of_v<google::protobuf::Message, T>>;
 
  public:
   using ConcreteMessagePtr = std::shared_ptr<MSG>;
@@ -150,7 +153,7 @@ class ProtobufCodecLiteT {
   }
 
   ProtobufMessageCallback messageCallback_;
-  ProtobufCodecLite codec_;
+  CODEC codec_;
 };
 
 }  // namespace starry

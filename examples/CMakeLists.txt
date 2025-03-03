@@ -1,7 +1,7 @@
 # 列出所有模块
 set(MODULES
-  ./simple/
-  ./rpc/
+  # ./simple/
+  # ./rpc/
     # 添加其他模块...
 )
 

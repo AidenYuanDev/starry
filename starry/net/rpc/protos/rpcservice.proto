@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package starry;
+
+// Import common error codes and types
+import "rpc.proto";
+
+// Request to list available RPC services
+message ListRpcRequest {
+  // Optional service name to filter results
+  // If not provided, all services will be listed
+  string service_name = 1;
+  
+  // Whether to include method details
+  bool list_methods = 2;
+}
+
+// Response containing RPC service information
+message ListRpcResponse {
+  // Operation status
+  ErrorCode error = 1;
+  
+  // List of service names
+  repeated string service_names = 2;
+  
+  // List of method names (fully qualified)
+  repeated string method_names = 3;
+}
+
+// Request to get service definition details
+message GetServiceRequest {
+  // Service name to retrieve
+  string service_name = 1;
+}
+
+// Response containing service definition details
+message GetServiceResponse {
+  // Operation status
+  ErrorCode error = 1;
+  
+  // Protocol buffer file content as strings
+  repeated string proto_files = 2;
+  
+  // Protocol buffer file names
+  repeated string proto_file_names = 3;
+}
+
+// The meta service for RPC framework
+service RpcMetaService {
+  // List available RPC services and methods
+  rpc ListRpc(ListRpcRequest) returns (ListRpcResponse) {}
+  
+  // Get service definition details
+  rpc GetService(GetServiceRequest) returns (GetServiceResponse) {}
+}
