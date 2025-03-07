@@ -6,17 +6,46 @@
 #include <string>
 #include <string_view>
 
-namespace starry {
-namespace compiler {
+namespace starry::compiler {
 
-// 声明为extern，这样在多个.cpp文件中包含也不会有多重定义问题
-extern const char kThickSeparator[];
-extern const char kThinSeparator[];
+extern const std::string kThickSeparator;
+extern const std::string kThinSeparator;
 
-// 声明为inline函数，这样可以在多个.cpp文件中包含
+class ServiceGenerator {
+ public:
+  enum StubOrNon { NON_STUB, STUB };
+  enum RequestOrResponse { REQUEST, RESPONSE };
+  ServiceGenerator(const google::protobuf::ServiceDescriptor* descriptor,
+                   std::string_view filename,
+                   int index);
+  ~ServiceGenerator() = default;
+  ServiceGenerator(const ServiceGenerator&) = delete;
+  ServiceGenerator& operator=(const ServiceGenerator&) = delete;
+
+  void generateDeclarations(google::protobuf::io::Printer* printer);
+  void generateImplementation(google::protobuf::io::Printer* printer);
+
+  static void genHeader(google::protobuf::io::Printer& printer);
+
+ private:
+  void generateInterface(google::protobuf::io::Printer* printer);
+  void generateStubDefinition(google::protobuf::io::Printer* printer);
+  void generateMethodSignatures(StubOrNon stub_or_non,
+                                google::protobuf::io::Printer* printer);
+  void generateDescriptorInitializer(google::protobuf::io::Printer* printer,
+                                     int index);
+  void generateNotImplementedMethods(google::protobuf::io::Printer* printer);
+  void generateCallMethod(google::protobuf::io::Printer* printer);
+  void generateGetPrototype(RequestOrResponse which,
+                            google::protobuf::io::Printer* printer);
+  void generateStubMethods(google::protobuf::io::Printer* printer);
+
+  const google::protobuf::ServiceDescriptor* descriptor_;
+  std::map<std::string, std::string> vars_;
+};
+
 inline std::string ClassName(const google::protobuf::Descriptor* descriptor,
-                    bool qualified) {
-  // 在本函数中实现获取类名的逻辑，根据是否需要限定名
+                             bool qualified) {
   std::string result;
   if (qualified) {
     result = descriptor->file()->package();
@@ -33,44 +62,10 @@ inline std::string ClassName(const google::protobuf::Descriptor* descriptor,
   return result;
 }
 
-inline std::string StripProto(const std::string& filename) {
-  if (filename.length() >= 6 &&
-      filename.compare(filename.length() - 6, 6, ".proto") == 0) {
-    return filename.substr(0, filename.length() - 6);
-  }
-  return filename;
+inline std::string protoBaseName(const std::string& filename) {
+  std::size_t pos = filename.find_last_of(".");
+  assert(pos != std::string::npos);
+
+  return filename.substr(0, pos);
 }
-
-class ServiceGenerator {
- public:
-  enum StubOrNon { NON_STUB, STUB };
-  enum RequestOrResponse { REQUEST, RESPONSE };
-  ServiceGenerator(const google::protobuf::ServiceDescriptor* descriptor,
-                   std::string_view filename,
-                   int index);
-  ~ServiceGenerator();
-  ServiceGenerator(const ServiceGenerator&) = delete;
-  ServiceGenerator& operator=(const ServiceGenerator&) = delete;
-
-  void GenerateDeclarations(google::protobuf::io::Printer* printer);
-  void GenerateImplementation(google::protobuf::io::Printer* printer);
-
- private:
-  void GenerateInterface(google::protobuf::io::Printer* printer);
-  void GenerateStubDefinition(google::protobuf::io::Printer* printer);
-  void GenerateMethodSignatures(StubOrNon stub_or_non,
-                                google::protobuf::io::Printer* printer);
-  void GenerateDescriptorInitializer(google::protobuf::io::Printer* printer,
-                                     int index);
-  void GenerateNotImplementedMethods(google::protobuf::io::Printer* printer);
-  void GenerateCallMethod(google::protobuf::io::Printer* printer);
-  void GenerateGetPrototype(RequestOrResponse which,
-                            google::protobuf::io::Printer* printer);
-  void GenerateStubMethods(google::protobuf::io::Printer* printer);
-
-  const google::protobuf::ServiceDescriptor* descriptor_;
-  std::map<std::string, std::string> vars_;
-};
-
-}  // namespace compiler
-}  // namespace starry
+}  // namespace starry::compiler

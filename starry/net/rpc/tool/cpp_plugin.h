@@ -9,6 +9,8 @@ class FileDescriptor;
 
 }
 
+namespace starry::compiler {
+
 class CppStarryGenerator : public google::protobuf::compiler::CodeGenerator {
  public:
   CppStarryGenerator() {}
@@ -19,11 +21,6 @@ class CppStarryGenerator : public google::protobuf::compiler::CodeGenerator {
                 const std::string& parameter,
                 google::protobuf::compiler::GeneratorContext* context,
                 std::string* error) const;
-
- private:
-  std::string protoBaseName(const std::string& filename) const;
-
-  static void genHeader(google::protobuf::io::Printer& printer);
-  static void genNamespaceBegin(google::protobuf::io::Printer& printer);
-  static void genNamespaceEnd(google::protobuf::io::Printer& printer);
 };
+
+}

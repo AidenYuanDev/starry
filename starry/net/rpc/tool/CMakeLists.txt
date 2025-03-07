@@ -1,6 +1,6 @@
 # 1. 构建 Protobuf 插件
 add_executable(gen-cpp-plugin
-  ./gen.cpp
+  ./cpp_plugin.cpp
   ./cpp_service.cpp
 )
 
