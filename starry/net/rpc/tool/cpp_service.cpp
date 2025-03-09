@@ -2,6 +2,7 @@
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/io/printer.h>
+#include <google/protobuf/message_lite.h>
 #include <string>
 #include <string_view>
 
@@ -61,9 +62,9 @@ void ServiceGenerator::generateInterface(
       "\n"
       "const ::google::protobuf::ServiceDescriptor* GetDescriptor() override;\n"
       "void CallMethod(const ::google::protobuf::MethodDescriptor* method,\n"
-      "                const ::google::protobuf::MessagePtr&* request,\n"
-      "                ::google::protobuf::Message* responsePrototype,\n"
-      "                const ::starry::RpcDoneCallback& done) override;\n"
+      "                const ::google::protobuf::MessagePtr& request,\n"
+      "                const ::google::protobuf::Message* responsePrototype,\n"
+      "                const RpcDoneCallback& done);\n"
       "const ::google::protobuf::Message& GetRequestPrototype(\n"
       "  const ::google::protobuf::MethodDescriptor* method) const override;\n"
       "const ::google::protobuf::Message& GetResponsePrototype(\n"
@@ -130,7 +131,7 @@ void ServiceGenerator::generateMethodSignatures(
           sub_vars,
           "$virtual$void $name$(const $input_type$Ptr& request,\n"
           "                     const $output_type$* responsePrototype,\n"
-          "                     const ::starry::RpcDoneCallback& done);\n");
+          "                     const RpcDoneCallback& done);\n");
     } else {
       printer->Print(sub_vars,
                      "using $classname$::$name$;\n"
@@ -162,7 +163,7 @@ void ServiceGenerator::generateImplementation(
       "\n"
       "const ::google::protobuf::ServiceDescriptor* $classname$::descriptor() "
       "{\n"
-      "  protobuf_AssignDescriptorsOnce();\n"
+      // "  protobuf_AssignDescriptorsOnce();\n"
       "  if ($classname$_descriptor_ == NULL)\n"
       "    $classname$_descriptor_ = "
       "::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(\n"
@@ -213,11 +214,11 @@ void ServiceGenerator::generateNotImplementedMethods(
         sub_vars,
         "void $classname$::$name$(const $input_type$Ptr&,\n"
         "                         const $output_type$*,\n"
-        "                         const ::starry::RpcDoneCallback& done) "
+          "                       const RpcDoneCallback& done)\n"
         "{\n"
         // "  controller->SetFailed(\"Method $name$() not implemented.\");\n"
         "  assert(0);\n"
-        "  done(NULL);\n"
+        "  done(nullptr);\n"
         "}\n"
         "\n");
   }
@@ -233,8 +234,8 @@ void ServiceGenerator::generateCallMethod(
       "request,\n"
       "                             const ::google::protobuf::Message* "
       "responsePrototype,\n"
-      "                             const ::starry::RpcDoneCallback& done) {\n"
-      "  GOOGLE_DCHECK_EQ(method->service(), $classname$_descriptor_);\n"
+      "                             const ::starry::RpcDoneCallback& done) "
+      "{\n"
       "  switch(method->index()) {\n");
 
   for (int i = 0; i < descriptor_->method_count(); i++) {
@@ -242,14 +243,14 @@ void ServiceGenerator::generateCallMethod(
     std::map<std::string, std::string> sub_vars;
     sub_vars["name"] = method->name();
     sub_vars["index"] = std::to_string(i);
-    sub_vars["input_type"] = ClassName(method->input_type(), true);
-    sub_vars["output_type"] = ClassName(method->output_type(), true);
+    sub_vars["input_type"] = ClassName(method->input_type(), false);
+    sub_vars["output_type"] = ClassName(method->output_type(), false);
 
     printer->Print(
         sub_vars,
         "    case $index$:\n"
-        "      $name$(std::static_pointer_cast<const $input_type$>(request),\n"
-        "             down_cast<$output_type$*>(responsePrototype),\n"
+        "      $name$(::starry::down_pointer_case<$input_type$>(request),\n"
+        "             ::starry::down_case<const $output_type$*>(responsePrototype),\n"
         "             done);\n"
         "      break;\n");
   }

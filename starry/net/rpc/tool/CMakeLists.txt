@@ -4,7 +4,7 @@ add_executable(gen-cpp-plugin
   ./cpp_service.cpp
 )
 
-target_include_directories(gen-cpp-plugin PRIVATE .
+target_include_directories(gen-cpp-plugin PRIVATE ..
   ${Protobuf_INCLUDE_DIRS}
   ${ABSL_INCLUDE_DIRS}
 )
@@ -13,6 +13,8 @@ target_link_libraries(gen-cpp-plugin PRIVATE
   ${Protobuf_LIBRARIES}
   ${Protobuf_PROTOC_LIBRARIES}  # 添加 Protobuf 编译器库
   PkgConfig::ABSL
+  net 
+  log
 )
 
 # # 2. 设置 Proto 生成目录
