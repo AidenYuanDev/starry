@@ -28,7 +28,6 @@ add_custom_command(
             --plugin=protoc-gen-cpp-plugin=${PLUGIN_PATH}
             --cpp-plugin_out=${PROTO_OUT_DIR} 
             -I${CMAKE_CURRENT_SOURCE_DIR}/protos/
-            -I${CMAKE_CURRENT_SOURCE_DIR}/tool/service.h
             -I${PROTO_OUT_DIR}
             ${PROTO_FILES}
     DEPENDS ${PROTO_FILES} ${PLUGIN_PATH}

@@ -12,7 +12,7 @@ message ListRpcRequest {
   string service_name = 1;
   
   // Whether to include method details
-  bool list_methods = 2;
+  bool list_method = 2;
 }
 
 // Response containing RPC service information
@@ -21,10 +21,10 @@ message ListRpcResponse {
   ErrorCode error = 1;
   
   // List of service names
-  repeated string service_names = 2;
+  string service_name = 2;
   
   // List of method names (fully qualified)
-  repeated string method_names = 3;
+  repeated string method_name = 3;
 }
 
 // Request to get service definition details
@@ -42,11 +42,11 @@ message GetServiceResponse {
   repeated string proto_files = 2;
   
   // Protocol buffer file names
-  repeated string proto_file_names = 3;
+  repeated string proto_file_name = 3;
 }
 
 // The meta service for RPC framework
-service RpcMetaService {
+service RpcService {
   // List available RPC services and methods
   rpc ListRpc(ListRpcRequest) returns (ListRpcResponse) {}
   
