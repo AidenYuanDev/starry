@@ -17,6 +17,7 @@ target_sources(net PRIVATE
   ./src/tcp_server.cpp
   ./src/acceptor.cpp
   ./src/tcp_client.cpp
+  ./src/connector.cpp
   ./src/timer.cpp
   ./src/timer_queue.cpp
 )

@@ -27,49 +27,49 @@ void addMethodNames(const ::google::protobuf::ServiceDescriptor* sd,
 void RpcServiceImpl::listRpc(const ListRpcRequestPtr& request,
                              const ListRpcResponse*,
                              const RpcDoneCallback& done) {
-  ListRpcResponse response;
+  ListRpcResponse* response = new ListRpcResponse();
   if (!request->service_name().empty()) {
     ServiceMap::const_iterator it = services_->find(request->service_name());
     if (it != services_->end()) {
-      response.set_error(NO_ERROR);
-      response.add_method_name(it->first);
+      response->set_error(NO_ERROR);
+      response->add_method_name(it->first);
       if (request->list_method()) {
-        addMethodNames(it->second->GetDescriptor(), &response);
+        addMethodNames(it->second->GetDescriptor(), response);
       }
     } else {
-      response.set_error(NO_METHOD);
+      response->set_error(NO_METHOD);
     }
   } else {
-    response.set_error(NO_ERROR);
+    response->set_error(NO_ERROR);
     for (ServiceMap::const_iterator it = services_->begin();
          it != services_->end(); it++) {
-      response.add_service_name(it->first);
+      response->add_service_name(it->first);
       if (request->list_method()) {
-        addMethodNames(it->second->GetDescriptor(), &response);
+        addMethodNames(it->second->GetDescriptor(), response);
       }
     }
   }
-  done(&response);
+  done(response);
 }
 
 void RpcServiceImpl::getService(const GetServiceRequestPtr& request,
                                 const GetServiceResponse*,
                                 const RpcDoneCallback& done) {
-  GetServiceResponse response;
+  GetServiceResponse* response = new GetServiceResponse();
   ServiceMap::const_iterator it = services_->find(request->service_name());
   if (it != services_->end()) {
-    response.set_error(NO_ERROR);
+    response->set_error(NO_ERROR);
     const ::google::protobuf::FileDescriptor* fd =
         it->second->GetDescriptor()->file();
-    response.add_proto_files(fd->DebugString());
-    response.add_proto_file_name(fd->name());
+    response->add_proto_files(fd->DebugString());
+    response->add_proto_file_name(fd->name());
 
     for (int i = 0; i < fd->dependency_count(); i++) {
-      response.add_proto_files(fd->dependency(i)->DebugString());
-      response.add_proto_file_name(fd->dependency(i)->name());
+      response->add_proto_files(fd->dependency(i)->DebugString());
+      response->add_proto_file_name(fd->dependency(i)->name());
     }
   } else {
-    response.set_error(NO_SERVICE);
+    response->set_error(NO_SERVICE);
   }
-  done(&response);
+  done(response);
 }

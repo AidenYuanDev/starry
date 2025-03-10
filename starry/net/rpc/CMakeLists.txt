@@ -41,7 +41,7 @@ add_library(rpc
   ./rpc_codec.cpp
   ./rpc_channel.cpp
   ./rpc_service.cpp
-  ./rpc_server.h
+  ./rpc_server.cpp
   ${GENERATED_PB_FILES}  # 将生成的文件添加到库中
 )
 
@@ -56,6 +56,7 @@ target_include_directories(rpc PUBLIC
 # 链接库
 target_link_libraries(rpc PUBLIC
   ${Protobuf_LIBRARIES}
+  ZLIB::ZLIB
   PkgConfig::ABSL
   net 
   log

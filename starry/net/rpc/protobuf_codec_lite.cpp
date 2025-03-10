@@ -32,9 +32,9 @@ void ProtobufCodecLite::fillEmptyBuffer(
   assert(buf->readableBytes() == 0);
 
   // 预留足够的空间，避免多次内存分配
-  size_t messageSize = message.ByteSizeLong();
-  size_t totalSize = kHeaderLen + tag_.size() + messageSize + kChecksumLen;
-  buf->ensureWritableBytes(totalSize);
+  // size_t messageSize = message.ByteSizeLong();
+  // size_t totalSize = kHeaderLen + tag_.size() + messageSize + kChecksumLen;
+  // buf->ensureWritableBytes(totalSize);
 
   // 添加 tag
   buf->append(tag_);
@@ -50,7 +50,7 @@ void ProtobufCodecLite::fillEmptyBuffer(
 
   // 添加总长度
   int32_t len = htobe32(static_cast<int32_t>(buf->readableBytes()));
-  buf->prepend(&len, len);
+  buf->prepend(&len, sizeof len);
 }
 
 bool ProtobufCodecLite::parseFromBuffer(std::span<const char> buf,
@@ -87,10 +87,9 @@ void ProtobufCodecLite::onMessage(const TcpConnectionPtr& conn,
                                   Buffer* buf,
                                   Timestamp receiveTime) {
   // 使用 Arena 优化内存分配
-  google::protobuf::Arena arena;
+  // google::protobuf::Arena arena;
 
-  while (buf->readableBytes() >=
-         static_cast<uint32_t>(kMinMessageLen + kHeaderLen)) {
+  while (buf->readableBytes() >= static_cast<uint32_t>(kMinMessageLen + kHeaderLen)) {
     const int32_t len = buf->peekInt32();
     if (len > kMaxMessageLen || len < kMinMessageLen) {
       errorCallback_(conn, buf, receiveTime, ErrorCode::kInvalidLength);
@@ -99,8 +98,8 @@ void ProtobufCodecLite::onMessage(const TcpConnectionPtr& conn,
     }
 
     if (buf->readableBytes() >= implicit_cast<size_t>(kHeaderLen + len)) {
-      // 优化：使用 Arena 分配消息对象
-      MessagePtr message(prototype_->New(&arena));
+      // 不使用Arena分配消息对象
+      MessagePtr message(prototype_->New());  // 移除arena参数
 
       ErrorCode errorCode =
           parse(std::span(buf->peek() + kHeaderLen, len), message.get());

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package echo;
+
+service EchoService {
+  // 基本的Echo方法，接收消息并返回相同消息
+  rpc Echo(EchoRequest) returns (EchoResponse) {}
+  
+  // 带有前缀的Echo方法
+  rpc EchoWithPrefix(EchoRequest) returns (EchoResponse) {}
+}
+
+message EchoRequest {
+  string message = 1;
+}
+
+message EchoResponse {
+  string message = 1;
+  string timestamp = 2;  // 服务器处理时间
+}
