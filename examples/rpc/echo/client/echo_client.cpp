@@ -54,9 +54,9 @@ int main(int argc, char* argv[]) {
       });
 
   // 设置消息回调
-  client.setMessageCallback(std::bind(
-      &starry::RpcChannel::onMessage, channel.get(), std::placeholders::_1,
-      std::placeholders::_2, std::placeholders::_3));
+  client.setMessageCallback(std::bind(&starry::RpcChannel::onMessage,
+                                      channel.get(), starry::_1, starry::_2,
+                                      starry::_3));
 
   // 连接服务器
   client.connect();

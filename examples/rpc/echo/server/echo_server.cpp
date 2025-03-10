@@ -1,8 +1,5 @@
 #include <chrono>
 #include <format>
-#include <functional>
-#include <iostream>
-#include <memory>
 #include <string>
 
 #include "echo.pb.h"
@@ -29,7 +26,7 @@ class EchoServiceImpl : public echo::EchoService {
   }
 
   void EchoWithPrefix(const echo::EchoRequestPtr& request,
-                      const echo::EchoResponse* responsePrototype,
+                      const echo::EchoResponse*,
                       const starry::RpcDoneCallback& done) override {
     // 创建响应对象
     echo::EchoResponse response;
@@ -52,7 +49,7 @@ class EchoServiceImpl : public echo::EchoService {
   }
 };
 
-int main(int argc, char* argv[]) {
+int main() {
   starry::Logger::setLogLevel(starry::LogLevel::INFO);
   LOG_INFO << "Starting Echo RPC Server...";
 

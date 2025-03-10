@@ -120,11 +120,7 @@ class ProtobufCodecLiteT {
       : messageCallback_(messageCb),
         codec_(&MSG::default_instance(),
                TAG,
-               std::bind(&ProtobufCodecLiteT::onRpcMessage,
-                         this,
-                         std::placeholders::_1,
-                         std::placeholders::_2,
-                         std::placeholders::_3),
+               std::bind(&ProtobufCodecLiteT::onRpcMessage, this, _1, _2, _3),
                rawCb,
                errorCb) {}
 

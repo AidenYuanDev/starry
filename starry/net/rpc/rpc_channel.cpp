@@ -15,21 +15,13 @@
 namespace starry {
 
 RpcChannel::RpcChannel()
-    : codec_(std::bind(&RpcChannel::onRpcMessage,
-                       this,
-                       std::placeholders::_1,
-                       std::placeholders::_2,
-                       std::placeholders::_3)),
+    : codec_(std::bind(&RpcChannel::onRpcMessage, this, _1, _2, _3)),
       services_(nullptr) {
   LOG_INFO << "RpcChannel::ctor - " << this;
 }
 
 RpcChannel::RpcChannel(const TcpConnectionPtr& conn)
-    : codec_(std::bind(&RpcChannel::onRpcMessage,
-                       this,
-                       std::placeholders::_1,
-                       std::placeholders::_2,
-                       std::placeholders::_3)),
+    : codec_(std::bind(&RpcChannel::onRpcMessage, this, _1, _2, _3)),
       conn_(conn),
       services_(nullptr) {
   LOG_INFO << "RpcChannel::ctol - " << this;
@@ -126,10 +118,9 @@ void RpcChannel::callServiceMethod(const RpcMessage& message) {
         int64_t id = message.id();
         const ::google::protobuf::Message* responsePrototype =
             &service->GetResponsePrototype(method);
-        service->CallMethod(
-            method, request, responsePrototype,
-            std::bind(&RpcChannel::doneCallback, this, responsePrototype,
-                      std::placeholders::_1, id));
+        service->CallMethod(method, request, responsePrototype,
+                            std::bind(&RpcChannel::doneCallback, this,
+                                      responsePrototype, _1, id));
       } else {
       }
     } else {

@@ -72,7 +72,7 @@ class RpcChannel {
       const Output* response,
       const ::std::function<void(const std::shared_ptr<Output>&)>& done) {
     CallMethod(method, request, response,
-               std::bind(&downcastcall<Output>, done, std::placeholders::_1));
+               std::bind(&downcastcall<Output>, done, _1));
   }
 
   void onDisconnect();

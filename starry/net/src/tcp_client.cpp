@@ -7,9 +7,9 @@
 #include "connector.h"
 #include "eventloop.h"
 #include "inet_address.h"
-#include "tcp_client.h"
 #include "logging.h"
 #include "sockets_ops.h"
+#include "tcp_client.h"
 #include "tcp_connection.h"
 
 using namespace starry;
@@ -22,7 +22,7 @@ void removeConnection(EventLoop* loop, const TcpConnectionPtr& conn) {
 
 void removeConnector(const ConnectorPtr&) {}
 
-}
+}  // namespace starry::detail
 
 TcpClient::TcpClient(EventLoop* loop,
                      const InetAddress& serverAddr,
@@ -36,7 +36,7 @@ TcpClient::TcpClient(EventLoop* loop,
       connect_(true),
       nextConnId_(1) {
   connector_->setNewConnectionCallback(
-      std::bind(&TcpClient::newConnection, this, std::placeholders::_1));
+      std::bind(&TcpClient::newConnection, this, _1));
   LOG_INFO << "TcpClient::TcpClient[" << name_ << "] - connector "
            << connector_.get();
 }
@@ -53,7 +53,7 @@ TcpClient::~TcpClient() {
   }
   if (conn) {
     assert(loop_ == conn->getLoop());
-    CloseCallback cb = std::bind(&detail::removeConnection, loop_, std::placeholders::_1);
+    CloseCallback cb = std::bind(&detail::removeConnection, loop_, _1);
     loop_->runInLoop(std::bind(&TcpConnection::setCloseCallback, conn, cb));
     if (unique) {
       conn->forceClose();
@@ -90,14 +90,16 @@ void TcpClient::stop() {
 void TcpClient::newConnection(int sockfd) {
   loop_->assertInLoopThread();
   InetAddress peerAddr(sockets::getPeerAddr(sockfd));
-  std::string connName = std::format("{}:{}#{}", name_, peerAddr.toIpPort(), nextConnId_++);
+  std::string connName =
+      std::format("{}:{}#{}", name_, peerAddr.toIpPort(), nextConnId_++);
 
   InetAddress locaAddr(sockets::getLocalAddr(sockfd));
-  TcpConnectionPtr conn(new TcpConnection(loop_, connName, sockfd, locaAddr, peerAddr));
+  TcpConnectionPtr conn(
+      new TcpConnection(loop_, connName, sockfd, locaAddr, peerAddr));
   conn->setConnectionCallback(connectionCallback_);
   conn->setMessageCallback(messageCallback_);
   conn->setWriteCompleteCallback(writeCompleteCallback_);
-  conn->setCloseCallback(std::bind(&TcpClient::removeConnection, this, std::placeholders::_1));
+  conn->setCloseCallback(std::bind(&TcpClient::removeConnection, this, _1));
   {
     std::lock_guard<std::mutex> lock(mutex_);
     connection_ = conn;
