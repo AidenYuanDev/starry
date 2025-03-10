@@ -1,5 +1,6 @@
 #pragma once
 
+#include <any>
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -51,6 +52,13 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
   void startRead();                            // 开启读
   void stopRead();                             // 停止读
   bool isReading() const { return reading_; }  // 是否正在读
+  
+  // Context
+  void setContext(const std::any& context) { context_ = context; }
+
+  const std::any& getContext() const { return context_; }
+
+  std::any* getMutableContext() { return &context_; }
 
   // 设置连接回调
   void setConnectionCallback(const ConnectionCallback& cb) {
@@ -111,6 +119,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
   size_t highWaterMark_;                         // 高水位线
   Buffer inputBuffer_;                           // 读缓冲区
   Buffer outputBuffer_;                          // 写缓冲区
+  std::any context_;
 };
 
 using TcpConnectionPtr = std::shared_ptr<TcpConnection>;

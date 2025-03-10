@@ -1,6 +1,4 @@
-# 生成插件
-add_subdirectory(./tool/)
-# 设置输出目录
+#r设置输出目录
 set(PROTO_OUT_DIR ${CMAKE_BINARY_DIR}/generated)
 file(MAKE_DIRECTORY ${PROTO_OUT_DIR})
 
@@ -12,12 +10,8 @@ set(PLUGIN_PATH ${CMAKE_BINARY_DIR}/bin/gen-cpp-plugin)
 
 # 定义生成的文件
 set(GENERATED_PB_FILES
-    ${PROTO_OUT_DIR}/a.pb.cc 
-    ${PROTO_OUT_DIR}/a.pb.h 
-    ${PROTO_OUT_DIR}/rpc.pb.cc 
-    ${PROTO_OUT_DIR}/rpc.pb.h 
-    ${PROTO_OUT_DIR}/rpcservice.pb.cc 
-    ${PROTO_OUT_DIR}/rpcservice.pb.h 
+    ${PROTO_OUT_DIR}/resolver.pb.cc 
+    ${PROTO_OUT_DIR}/resolver.pb.h 
 )
 
 # 自定义命令生成 protobuf 文件
@@ -35,18 +29,14 @@ add_custom_command(
     VERBATIM
 )
 
-# 定义 rpc 库，并包含生成的文件
-add_library(rpc
-  ./protobuf_codec_lite.cpp
-  ./rpc_codec.cpp
-  ./rpc_channel.cpp
-  ./rpc_service.cpp
-  ./rpc_server.h
+# 定义 resolver 库，并包含生成的文件
+add_executable(resolver
+  ./client.cpp
   ${GENERATED_PB_FILES}  # 将生成的文件添加到库中
 )
 
 # 设置包含目录
-target_include_directories(rpc PUBLIC
+target_include_directories(resolver PUBLIC
   .
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${Protobuf_INCLUDE_DIRS}
@@ -54,9 +44,13 @@ target_include_directories(rpc PUBLIC
 )
 
 # 链接库
-target_link_libraries(rpc PUBLIC
+target_link_libraries(resolver PUBLIC
   ${Protobuf_LIBRARIES}
   PkgConfig::ABSL
-  net 
+  # ZLIB::ZLIB
+  ${ZLIB_LIBRARIES}
   log
+  net 
+  net 
+  rpc
 )

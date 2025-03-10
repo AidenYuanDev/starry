@@ -2,6 +2,7 @@
 
 #include "callbacks.h"
 #include "timer_id.h"
+#include <any>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -63,6 +64,12 @@ class EventLoop {
   // 获取当前的 EventLoop 实例
   static EventLoop* getEventLoopOfCurrentThread();
 
+  void setContext(const std::any& context) { context_ = context; }
+
+  const std::any& getContext() const { return context_; }
+
+  std::any* getMutableContext() { return &context_; }
+
  private:
   void handleRead();         // 唤醒当前Loop
   void doPendingFunctors();  // 处理预处理函数
@@ -97,6 +104,8 @@ class EventLoop {
   // EventLoop的所持有的预处理函数函数的集和
   std::mutex mutex_;
   std::vector<Functor> pendingFunctors_;
+
+  std::any context_;
 };
 
 }  // namespace starry

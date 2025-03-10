@@ -3,6 +3,7 @@
 #include <google/protobuf/compiler/code_generator.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
+#include <google/protobuf/message_lite.h>
 #include <google/protobuf/service.h>
 #include <atomic>
 #include <cstdint>
@@ -59,7 +60,10 @@ class RpcChannel {
   template <typename Output>
   static void downcastcall(
       const ::std::function<void(const std::shared_ptr<Output>&)>& done,
-      const ::google::protobuf::MessagePtr& output);
+      const ::google::protobuf::MessagePtr& output) {
+    done(std::shared_ptr<Output>(
+        output, google::protobuf::DownCastMessage<Output>(output.get())));
+  }
 
   template <typename Output>
   void CallMethod(

@@ -21,7 +21,7 @@ message ListRpcResponse {
   ErrorCode error = 1;
   
   // List of service names
-  string service_name = 2;
+  repeated string service_name = 2;
   
   // List of method names (fully qualified)
   repeated string method_name = 3;
