@@ -26,6 +26,13 @@ net部分的改动的地方就少很多了。
 
 > net部分的代码已经非常优秀了，去除一些用不到的特性(偷懒)
 
+## RPC
+
+rpc部分是参考了muduo以及muduo-protorpc这两个项目。
+
+- 去除冗余的类，重写构建规则，并采用生成的`Cpp`文件内容插入到`pb.h/pb.cc`
+- 由proto2升级到proto3，并升级proto3推荐的API
+
 # 日志
 
 ![log](./images/log.png)
@@ -517,6 +524,10 @@ bool operator <(const TimerId timerid) const {
 ## TcpClient（设置回调）
 
 这个就与`TcpServer` 类似了，只不过一个`Client` 只有一个`EventLoop`
+
+# RPC
+
+
 
 # 性能测试
 
