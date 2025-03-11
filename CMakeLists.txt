@@ -5,8 +5,8 @@ project(starry VERSION 1.0.0 LANGUAGES CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # 包含项目设置和依赖查找
-include(ProjectSettings)
-include(FindDependencies)
+include(./cmake/ProjectSettings.cmake)
+include(./cmake/FindDependencies.cmake)
 
 # 添加子目录
 add_subdirectory(./starry/)

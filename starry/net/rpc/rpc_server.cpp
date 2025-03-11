@@ -15,8 +15,7 @@ RpcServer::RpcServer(EventLoop* loop, const InetAddress& listenAddr)
       server_(loop, listenAddr, "RpcServer"),
       services_(),
       metaService_(&services_) {
-  server_.setConnectionCallback(
-      std::bind(&RpcServer::onConnection, this, std::placeholders::_1));
+  server_.setConnectionCallback(std::bind(&RpcServer::onConnection, this, _1));
   registerService(&metaService_);
 }
 
@@ -37,8 +36,7 @@ void RpcServer::onConnection(const TcpConnectionPtr& conn) {
     RpcChannelPtr channel(new RpcChannel(conn));
     channel->setServices(&services_);
     conn->setMessageCallback(
-        std::bind(&RpcChannel::onMessage, channel.get(), std::placeholders::_1,
-                  std::placeholders::_2, std::placeholders::_3));
+        std::bind(&RpcChannel::onMessage, channel.get(), _1, _2, _3));
     conn->setContext(channel);
   } else {
     conn->setContext(RpcChannelPtr());

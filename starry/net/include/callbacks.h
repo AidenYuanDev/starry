@@ -7,8 +7,9 @@
 #include "types.h"
 namespace starry {
 
-template<typename To, typename From>
-inline ::std::shared_ptr<To> down_pointer_case(const ::std::shared_ptr<From> &f) {
+template <typename To, typename From>
+inline ::std::shared_ptr<To> down_pointer_case(
+    const ::std::shared_ptr<From>& f) {
   if (false) {
     implicit_cast<From*, To*>(0);
   }
@@ -21,6 +22,7 @@ class TcpConnection;
 using Timestamp = std::chrono::system_clock::time_point;
 using Clock = std::chrono::system_clock;
 using TcpConnectionPtr = std::shared_ptr<TcpConnection>;
+#include <functional>
 using TimerCallback = std::function<void()>;
 using ConnectionCallback = std::function<void(const TcpConnectionPtr&)>;
 using CloseCallback = std::function<void(const TcpConnectionPtr&)>;
@@ -34,5 +36,7 @@ void defaultConnectionCallback(const TcpConnectionPtr& conn);
 void defaultMessageCallback(const TcpConnectionPtr& conn,
                             Buffer* buffer,
                             Timestamp receiveTime);
+
+using namespace std::placeholders;
 
 }  // namespace starry

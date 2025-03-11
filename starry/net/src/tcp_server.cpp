@@ -27,9 +27,8 @@ TcpServer::TcpServer(EventLoop* loop,
       connectionCallback_(defaultConnectionCallback),
       messageCallback_(defaultMessageCallback),
       nextConnId_(1) {
-  acceptor_->setNewConnectionCallback(std::bind(&TcpServer::newConnection, this,
-                                                std::placeholders::_1,
-                                                std::placeholders::_2));
+  acceptor_->setNewConnectionCallback(
+      std::bind(&TcpServer::newConnection, this, _1, _2));
 }
 
 TcpServer::~TcpServer() {
@@ -78,8 +77,7 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr) {
   conn->setConnectionCallback(connectionCallback_);
   conn->setMessageCallback(messageCallback_);
   conn->setWriteCompleteCallback(writeCompleteCallback_);
-  conn->setCloseCallback(
-      std::bind(&TcpServer::removeConnection, this, std::placeholders::_1));
+  conn->setCloseCallback(std::bind(&TcpServer::removeConnection, this, _1));
   ioLoop->runInLoop(std::bind(&TcpConnection::connectEstablished, conn));
 }
 
