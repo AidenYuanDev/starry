@@ -1,7 +1,7 @@
 # 生成插件
 add_subdirectory(./tool/)
 # 设置输出目录
-set(PROTO_OUT_DIR ${CMAKE_BINARY_DIR}/generated)
+set(PROTO_OUT_DIR ${CMAKE_BINARY_DIR}/generated/rpc)
 file(MAKE_DIRECTORY ${PROTO_OUT_DIR})
 
 # 获取所有 proto 文件
