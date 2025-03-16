@@ -32,7 +32,7 @@ RpcChannel::~RpcChannel() {
 }
 
 void RpcChannel::CallMethod(const ::google::protobuf::MethodDescriptor* method,
-                            const ::google::protobuf::Message&,
+                            const ::google::protobuf::Message& request,
                             const ::google::protobuf::Message* response,
                             const ClientDoneCallback& done) {
   RpcMessage message;
@@ -41,7 +41,7 @@ void RpcChannel::CallMethod(const ::google::protobuf::MethodDescriptor* method,
   message.set_id(id);
   message.set_service(method->service()->full_name());
   message.set_method(method->name());
-  message.set_request(response->SerializeAsString());
+  message.set_request(request.SerializeAsString());
 
   OutstandingCall out = {response, done};
   {
