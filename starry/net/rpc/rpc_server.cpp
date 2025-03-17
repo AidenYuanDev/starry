@@ -21,7 +21,7 @@ RpcServer::RpcServer(EventLoop* loop, const InetAddress& listenAddr)
 
 void RpcServer::registerService(Service* service) {
   const google::protobuf::ServiceDescriptor* desc = service->GetDescriptor();
-  services_[desc->full_name()] = service;
+  services_[std::string(desc->full_name())] = service;
 }
 
 void RpcServer::start() {
