@@ -2,7 +2,6 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/io/printer.h>
 #include <cassert>
-#include <iterator>
 #include <string>
 
 #include "cpp_plugin.h"
@@ -20,7 +19,7 @@ bool CppStarryGenerator::Generate(
     return false;
   }
 
-  std::string cpp_name = protoBaseName(file->name()) + ".pb";
+  std::string cpp_name = protoBaseName(std::string(file->name())) + ".pb";
 
   google::protobuf::io::Printer inc_printer(
       context->OpenForInsert(cpp_name + ".h", "includes"), '$');
